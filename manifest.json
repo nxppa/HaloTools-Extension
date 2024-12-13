@@ -1,0 +1,10 @@
+{
+  "name": "Halo Tools",
+  "description": "Halo tools are tools which help you trade and dominate the market, being able to directly embed into your browser or be used over telegram. We are brand new and excel in every sector; so be one of the first to take advantage.",
+  "version": "1.1",
+  "manifest_version": 3,
+  "action": {
+    "default_popup": "Login.html",
+    "default_icon": "Assets/Logo.png"
+  }
+}

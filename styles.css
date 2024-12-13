@@ -3,10 +3,14 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* IE/Edge */
 }
 
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Montserrat', sans-serif;
     background-color: #1b1b1b; /* Dark background */
     color: white;
     display: flex;
@@ -15,11 +19,15 @@ body {
     height: 600px; /* Fixed height */
     width: 360px; /* Fixed width */
     overflow: hidden; /* Prevent scrolling */
+    /*
     background-image: url('Assets/Rings.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
+    */
     transition: opacity 0.5s ease; /* Smooth fade effect */
+    opacity: 1; /* Fully visible by default */
+    animation: fadeOut 1s ease forwards; /* Fade out before redirect */
 }
 .hidden {
     opacity: 0; /* Fade out */
@@ -30,7 +38,7 @@ body {
 .container {
     width: 100%;
     height: 100%;
-    background-color: rgb(36, 36, 36, 0.9); /* Slightly lighter background */
+    background-color: #242424e6; /* Slightly lighter background */
     border-radius: 10px;
     display: flex;
     flex-direction: column;
@@ -48,7 +56,7 @@ body {
 
 .logo {
     font-weight: bold;
-    color: white;
+    color: #808080;
     text-align: center;
     flex-grow: 1;
     position: relative;
@@ -57,7 +65,7 @@ body {
 
 .help-icon {
     font-weight: bold;
-    color: gray;
+    color: #808080;
     cursor: pointer;
 }
 
@@ -82,7 +90,7 @@ h1 {
 }
 
 .input-box {
-    width: 85%;
+    width: 90%;
     padding: 14px;
     margin-bottom: 50px;
     font-size: 20px;
@@ -92,29 +100,18 @@ h1 {
     color: white;
     box-shadow: 0 0 15px 0px #4b4b4b; /* Initial glow */
     transition: box-shadow 0.5s ease; /* Smooth transition */
+    outline: none; /* Removes the blue outline on focus */
+    font-family: 'Montserrat', sans-serif;
+
 }
 
-/* Forgot Password Link */
-.forgot-password {
-    font-size: 16px;
-    color: gray;
-    text-decoration: none;
-    margin-bottom: 20px;
-    display: block;
-}
-
-.forgot-password:hover {
-    text-decoration: underline;
-}
-
-/* Footer */
 .footer {
     text-align: center;
 }
 
 .unlock-button {
     width: 90%;
-    padding: 20px;
+    padding: 14px;
     background-color: #FFBD59;
     color: rgb(73, 73, 73);
     font-size: 20px;
@@ -124,6 +121,8 @@ h1 {
     cursor: pointer;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 0 30px 0px #ffd000; /* Initial glow */
+    font-family: 'Montserrat', sans-serif;
+
 }
 
 .unlock-button:hover {

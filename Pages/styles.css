@@ -3,7 +3,12 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* IE/Edge */
 }
+
 
 body {
     font-family: Arial, sans-serif;
@@ -15,11 +20,6 @@ body {
     height: 600px; /* Fixed height */
     width: 360px; /* Fixed width */
     overflow: hidden; /* Prevent scrolling */
-    background-image: url('Assets/Rings.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    
 }
 
 
@@ -29,6 +29,6 @@ body {
     position: absolute;
     top: 20px; /* Distance from the top */
     right: 20px; /* Distance from the right */
-    width: 50px; /* Adjust size as needed */
+    width: 40px; /* Adjust size as needed */
     height: auto; /* Maintain aspect ratio */
 }

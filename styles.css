@@ -19,6 +19,10 @@ body {
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
+    transition: opacity 0.5s ease; /* Smooth fade effect */
+}
+.hidden {
+    opacity: 0; /* Fade out */
 }
 
 
@@ -87,6 +91,7 @@ h1 {
     background-color: #1b1b1b;
     color: white;
     box-shadow: 0 0 15px 0px #4b4b4b; /* Initial glow */
+    transition: box-shadow 0.5s ease; /* Smooth transition */
 }
 
 /* Forgot Password Link */
@@ -122,5 +127,6 @@ h1 {
 }
 
 .unlock-button:hover {
+    box-shadow: 0 0 30px 0px #ff9900; /* Initial glow */
     background-color: #ff9900; /* Darker purple on hover */
 }

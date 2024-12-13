@@ -1,0 +1,34 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1b1b1b; /* Dark background */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 600px; /* Fixed height */
+    width: 360px; /* Fixed width */
+    overflow: hidden; /* Prevent scrolling */
+    background-image: url('Assets/Rings.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+}
+
+
+
+/* Logo Styling */
+.logo {
+    position: absolute;
+    top: 20px; /* Distance from the top */
+    right: 20px; /* Distance from the right */
+    width: 50px; /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+}

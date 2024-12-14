@@ -7,6 +7,8 @@
     -webkit-user-select: none; /* Safari */
     -moz-user-select: none;    /* Firefox */
     -ms-user-select: none;     /* IE/Edge */
+
+
 }
 
 
@@ -20,8 +22,14 @@ body {
     height: 600px; /* Fixed height */
     width: 360px; /* Fixed width */
     overflow: hidden; /* Prevent scrolling */
-}
 
+    opacity: 0; /* Initial state: fully transparent */
+    transition: opacity 0.25s ease-in; /* Transition effect */
+
+}
+body.visible {
+    opacity: 1; /* Final state: fully opaque */
+}
 
 
 /* Logo Styling */
@@ -55,6 +63,7 @@ body {
     height: 100vh;
     width: 50px;
     box-shadow: 0 0 5px 0px #3f3f3f; /* Initial glow */
+    
 }
 
 
@@ -66,9 +75,9 @@ body {
     line-height: 83px;
 }
 .right-sidebar a img {
-    width: 40px; /* Set the size of the icons */
+    width: 32px; /* Set the size of the icons */
     height: auto;
-    transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth hover effect */
+    transition: transform 0.3s ease, opacity 0.3s ease; /* Smooth hover effect */
 }
 .right-sidebar a img:hover {
     opacity: 0.4; /* Slight transparency */

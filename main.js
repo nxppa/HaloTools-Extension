@@ -2,7 +2,7 @@
 //Nappa
 
 
-//b5f6ec4f48891b1cdd57fdedcd70b06efc21e34ffaccfce97f69bbe359885f7463e9ca3034ee89426ce396fba680ddca34b36797eb11164ebe0f8918ed615afd1
+//b5f6ec4f48891b1cdd57fdedcd70b06efc21e34ffaccfce97f69bbe359885f7463e9ca3034ee89426ce396fba680ddca34b36797eb11164ebe0f8918ed615afd
 //sanya
 const AuthTimeMins = 8
 window.addEventListener('unload', () => {
@@ -21,6 +21,12 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('session_token');
         document.cookie = 'session_token=; Max-Age=0; path=/';
     }
+    const History = window.history
+    if (History.length > 1){
+        //! came from page
+        //TODO make it invalidate token on server if here
+        ClearToken()
+    }
     async function SetToken(Token) {
         localStorage.setItem('session_token', Token);
         document.cookie = `session_token=${Token}; HttpOnly; Secure; Max-Age=${AuthTimeMins * 60};`
@@ -30,7 +36,13 @@ document.addEventListener('DOMContentLoaded', () => {
         InputBox.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.8)';
         setTimeout(() => {
             window.location.href = "Pages/Main/MainPage.html";
-        }, 500)
+        }, 250)
+    }
+    async function KeyFailure(){
+        InputBox.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.8)';
+        setTimeout(() => {
+            InputBox.style.boxShadow = '0 0 15px 0px #4b4b4b';
+        }, 1000)
     }
     async function ValidateOnLoad() {
         const Token = localStorage.getItem('session_token')
@@ -61,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
     InputBox.focus()
     async function ProccessEntry() { //TODO make ratelimit
         const password = InputBox.value;
-        const Req = `https://bayharbour.boats/authenticate?key=${password}`
+        const Req = `https://bayharbour.boats/authenticate?key=${password}` //TODO make it semantically verify based on length or whatever
         console.log("req: ", Req)
         const response = await fetch(Req);
         const result = await response.json();
@@ -71,10 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Authentication successful:', result);
             OpenMainPage()
         } else {
-            InputBox.style.boxShadow = '0 0 20px rgba(255, 0, 0, 0.8)';
-            setTimeout(() => {
-                InputBox.style.boxShadow = '0 0 15px 0px #4b4b4b';
-            }, 1000)
+        KeyFailure()
         }
     }
 

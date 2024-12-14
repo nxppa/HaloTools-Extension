@@ -1,4 +1,9 @@
 //34a75bef08004f789e548e709171c8822af6aec25b32260a169d2ac384746ecf8a01b6eb0ff56653d1e4fb5361e2f10495edea7ef56ef8d42884fea2b061e605
+//Nappa
+
+
+//b5f6ec4f48891b1cdd57fdedcd70b06efc21e34ffaccfce97f69bbe359885f7463e9ca3034ee89426ce396fba680ddca34b36797eb11164ebe0f8918ed615afd1
+//sanya
 const AuthTimeMins = 8
 window.addEventListener('unload', () => {
     const Token = localStorage.getItem('session_token')
@@ -10,7 +15,7 @@ window.addEventListener('unload', () => {
  
 
 
- 
+
 document.addEventListener('DOMContentLoaded', () => {
     function ClearToken() {
         localStorage.removeItem('session_token');

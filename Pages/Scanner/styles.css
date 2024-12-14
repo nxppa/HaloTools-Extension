@@ -1,0 +1,78 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* IE/Edge */
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1b1b1b; /* Dark background */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 600px; /* Fixed height */
+    width: 360px; /* Fixed width */
+    overflow: hidden; /* Prevent scrolling */
+}
+
+
+
+/* Logo Styling */
+.logo {
+    position: absolute;
+    top: 20px; /* Distance from the top */
+    right: 20px; /* Distance from the right */
+    width: 40px; /* Adjust size as needed */
+    height: auto; /* Maintain aspect ratio */
+}
+
+
+
+.main-content {
+    flex: 1; /* Fills the remaining space */
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+/* Right Sidebar */
+.right-sidebar {
+    position:absolute;
+    top:0;
+    left: 0;
+    background-color: #1b1b1b; /* Dark background for the bar */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    height: 100vh;
+    width: 50px;
+    box-shadow: 0 0 5px 0px #3f3f3f; /* Initial glow */
+}
+
+
+
+.right-sidebar ul li {
+    margin: 10px 0;
+    text-align: center;
+    list-style: none;
+    line-height: 83px;
+}
+.right-sidebar a img {
+    width: 40px; /* Set the size of the icons */
+    height: auto;
+    transition: transform 0.5s ease, opacity 0.5s ease; /* Smooth hover effect */
+}
+.right-sidebar a img:hover {
+    opacity: 0.4; /* Slight transparency */
+}
+.right-sidebar a img.active {
+    border-radius: 10px; /* Rounded corners */
+}

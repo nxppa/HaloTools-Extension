@@ -157,13 +157,42 @@ h1 {
     padding: 10px; /* Internal spacing */
     overflow-y: auto; /* Enable vertical scroll */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    font-family: Arial, sans-serif;
+    font-family: "Courier New", monospace;
     line-height: 1.5;
     margin-top: 40px;
     opacity: 1; /* Initially hidden */
     box-shadow: 0 0 10px 0px #4b4b4b; /* Initial glow */
     transition: opacity 0.5s ease-in-out; /* Smooth fade-in */
+    white-space: pre; /* Prevent text wrapping */
 
+}
+/* Target the entire scrollbar */
+::-webkit-scrollbar {
+    width: 8px; /* Width of vertical scrollbar */
+    height: 8px; /* Height of horizontal scrollbar */
+}
+
+/* Scrollbar track */
+::-webkit-scrollbar-track {
+    background: #2e2e2e; /* Dark background for the track */
+    border-radius: 4px;
+}
+
+/* Scrollbar thumb */
+::-webkit-scrollbar-thumb {
+    background-color: #555; /* Dark thumb color */
+    border-radius: 4px;
+    border: 2px solid #2e2e2e; /* Adds space around thumb */
+}
+
+/* Remove scrollbar buttons (arrows) */
+::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Optional: Scrollbar corner */
+::-webkit-scrollbar-corner {
+    background: #2e2e2e;
 }
 
 .scroll-box.visible {

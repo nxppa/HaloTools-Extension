@@ -60,7 +60,7 @@ body {
 
 .logo {
     font-weight: bold;
-    color: white;
+    color: #808080;
     text-align: center;
     flex-grow: 1;
     position: relative;

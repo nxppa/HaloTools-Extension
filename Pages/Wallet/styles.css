@@ -17,16 +17,17 @@ body {
     background-color: #1b1b1b; /* Dark background */
     color: white;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 600px; /* Fixed height */
-    width: 360px; /* Fixed width */
-    overflow: hidden; /* Prevent scrolling */
+    flex-direction: column;     /* Stack items vertically */
+    justify-content: flex-start; /* Align items vertically to the top */
+    align-items: center;         /* Center items horizontally */
+    height: 600px;               /* Fixed height */
+    width: 360px;                /* Fixed width */
+    overflow: hidden;            /* Prevent scrolling */
 
-    opacity: 0; /* Initial state: fully transparent */
-    transition: opacity 0.25s ease-in; /* Transition effect */
-
+    opacity: 0;                  /* Initial state: fully transparent */
+    transition: opacity 1s ease-in; /* Transition effect */
 }
+
 body.visible {
     opacity: 1; /* Final state: fully opaque */
 }

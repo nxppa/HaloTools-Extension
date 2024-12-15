@@ -4,16 +4,32 @@
 
 //b5f6ec4f48891b1cdd57fdedcd70b06efc21e34ffaccfce97f69bbe359885f7463e9ca3034ee89426ce396fba680ddca34b36797eb11164ebe0f8918ed615afd
 //sanya
+
+
+
+function SemanticalVerify(key) { //TODO make it semantically verify based on length or whatever
+    if (!key) {
+        return false
+    }
+
+    return true
+}
+
+
 const AuthTimeMins = 8
 window.addEventListener('unload', () => {
     const Token = localStorage.getItem('session_token')
-    if (Token) {
-        const req = `https://bayharbour.boats/validate?token=${Token}`
-        fetch(req)
-    }
+    const req = `https://bayharbour.boats/validate?token=${Token}`
+    fetch(req)
  })
- 
-
+ chrome.runtime.onConnect.addListener(function(port) {
+    if (port.name === "popup") {
+        port.onDisconnect.addListener(function() {
+            const req = `https://bayharbour.boats/validate?token=${Token}`
+            fetch(req)
+        });
+    }
+});
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -73,18 +89,20 @@ document.addEventListener('DOMContentLoaded', () => {
     InputBox.focus()
     async function ProccessEntry() { //TODO make ratelimit
         const password = InputBox.value;
-        const Req = `https://bayharbour.boats/authenticate?key=${password}` //TODO make it semantically verify based on length or whatever
-        console.log("req: ", Req)
-        const response = await fetch(Req);
-        const result = await response.json();
-        if (response.ok) {
-            SetToken(result.token)
-            console.log(result.token)
-            console.log('Authentication successful:', result);
-            OpenMainPage()
-        } else {
-        KeyFailure()
+        if (SemanticalVerify(password)){
+            const Req = `https://bayharbour.boats/authenticate?key=${password}` 
+            console.log("req: ", Req)
+            const response = await fetch(Req);
+            const result = await response.json();
+            if (response.ok) {
+                SetToken(result.token)
+                console.log(result.token)
+                console.log('Authentication successful:', result);
+                OpenMainPage()
+                return
+            }
         }
+        KeyFailure()
     }
 
     InputBox.addEventListener('keydown', (event) => {

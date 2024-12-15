@@ -10,33 +10,34 @@ const Colours = {
     "Balance": "#8eff93"
 }
 
+const SelectablePreset = "user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;"
 
 window.addEventListener('load', () => {
     //2huXTbjeBhtMZ1ugNwUGucYBRasRaaiypymUX6P1Kwjx
     function ParseJSON(result) {
-        const data = result.data
-        const Type = result.type
-        let BaseString = `<span style="color:${Colours.Type};">Type: </span><span style="color:${Colours.TypeAssigned};">${Type}<br></span>`
+        const data = result.data;
+        const Type = result.type;
+        let BaseString = `<span style="color:${Colours.Type}; ${SelectablePreset}">Type: </span><span style="color:${Colours.TypeAssigned}; ${SelectablePreset}">${Type}\n</span>`;
         switch (Type) {
             case "Wallet":
-                BaseString += `<span style="color:${Colours.Account};">Account: </span><span style= "color:${Colours.Program};">${data.account} <br></span>`
-                BaseString += `<span style="color:${Colours.Balance};">Balance: </span> <span style="color:${Colours.SOL};">${data.balance} Sol<br></span>`
-                BaseString += `<span style="color:${Colours.Positions};">Open Positions (${Object.keys(data.openPositions).length}): <br></span>`
+                BaseString += `<span style="color:${Colours.Account}; ${SelectablePreset}">Account: </span><span style="color:${Colours.Program}; ${SelectablePreset}">${data.account} \n</span>`;
+                BaseString += `<span style="color:${Colours.Balance}; ${SelectablePreset}">Balance: </span><span style="color:${Colours.SOL}; ${SelectablePreset}">${data.balance} Sol\n</span>`;
+                BaseString += `<span style="color:${Colours.Positions}; ${SelectablePreset}">Open Positions (${Object.keys(data.openPositions).length}): \n</span>`;
                 for (const Mint in data.openPositions){
-                    BaseString += `<span style= "color:${Colours.Program};">${Mint}:</span> <span style="color:${Colours.Numbers};">${data.openPositions[Mint]} <br></span>`
+                    BaseString += `<span style="color:${Colours.Program}; ${SelectablePreset}">${Mint}:</span> <span style="color:${Colours.Numbers}; ${SelectablePreset}">${data.openPositions[Mint]} \n</span>`;
                 }
-                break
+                break;
             case "Mint":
-                let AddedInfo = ""
+                let AddedInfo = "";
                 if (data.account.endsWith("pump")){
-                    AddedInfo = "(💊)"
+                    AddedInfo = "(💊)";
                 }
-                BaseString += `<span style="color:${Colours.Account};">Mint${AddedInfo}: </span><span style= "color:${Colours.Program};">${data.account} <br></span>`
-                break
-            }
-        return BaseString
-    
+                BaseString += `<span style="color:${Colours.Account}; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;">Mint${AddedInfo}: </span><span style="color:${Colours.Program}; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;">${data.account} \n</span>`;
+                break;
+        }
+        return BaseString;
     }
+    
     
     document.body.classList.add('visible');
     const InputBox = document.querySelector('input');

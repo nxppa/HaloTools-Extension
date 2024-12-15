@@ -32,8 +32,9 @@ window.addEventListener('load', () => {
                 if (data.account.endsWith("pump")){
                     AddedInfo = "(💊)";
                 }
-                BaseString += `<span style="color:${Colours.Account}; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;">Mint${AddedInfo}: </span><span style="color:${Colours.Program}; user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;">${data.account} \n</span>`;
+                BaseString += `<span style="color:${Colours.Account}; ${SelectablePreset}">Mint${AddedInfo}: </span><span style="color:${Colours.Program}; ${SelectablePreset}">${data.account} \n</span>`;
                 break;
+            //TODO add signatures, spl accounts and private keys (add private key support to server) 
         }
         return BaseString;
     }
@@ -41,12 +42,12 @@ window.addEventListener('load', () => {
     
     document.body.classList.add('visible');
     const InputBox = document.querySelector('input');
-      const OutputBox = document.getElementById("scroll-box")
+    const OutputBox = document.getElementById("scroll-box")
 
     async function QueryAccountDetails(){
         const Account = InputBox.value
         const Token = localStorage.getItem('session_token')
-        const Req = `https://bayharbour.boats/api/tools/scanner?session_token=${Token}&account=${Account}` 
+        const Req = `https://bayharbour.boats/api/tools/scanner?session_token=${Token}&account=${Account}` //TODO add client and server ratelimits
         console.log(Req)
         const Response = await fetch(Req)
         const result = await Response.json();
@@ -54,6 +55,11 @@ window.addEventListener('load', () => {
         console.log(result, Parsed)
         OutputBox.innerHTML = Parsed
     }
+    InputBox.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            QueryAccountDetails()
+        }
+    });
     document.getElementById("search").addEventListener("click", () => {
         QueryAccountDetails()
     })

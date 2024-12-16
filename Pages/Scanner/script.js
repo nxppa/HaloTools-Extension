@@ -34,6 +34,7 @@ window.addEventListener('load', () => {
                 }
                 BaseString += `<span style="color:${Colours.Account}; ${SelectablePreset}">Mint${AddedInfo}: </span><span style="color:${Colours.Program}; ${SelectablePreset}">${data.account} \n</span>`;
                 break;
+
             //TODO add signatures, spl accounts and private keys (add private key support to server) 
         }
         return BaseString;
@@ -47,14 +48,30 @@ window.addEventListener('load', () => {
     async function QueryAccountDetails(){
         const Account = InputBox.value
         const Token = localStorage.getItem('session_token')
-        const Req = `https://bayharbour.boats/api/tools/scanner?session_token=${Token}&account=${Account}` //TODO add client and server ratelimits
+        const Req = `https://bayharbour.boats/api/tools/scanner?session_token=${Token}&account=${encodeURIComponent(Account)}`
         console.log(Req)
-        const Response = await fetch(Req)
-        const result = await Response.json();
-        const Parsed = ParseJSON(result)
-        console.log(result, Parsed)
-        OutputBox.innerHTML = Parsed
+    
+        const loadingTexts = ["fetching.", "fetching..", "fetching..."]
+        let currentLoadingText = 0
+        OutputBox.innerHTML = loadingTexts[currentLoadingText]
+    
+        const loadingInterval = setInterval(() => {
+            currentLoadingText = (currentLoadingText + 1) % loadingTexts.length
+            OutputBox.innerHTML = loadingTexts[currentLoadingText]
+        }, 250)
+        try {
+            const Response = await fetch(Req)
+            const result = await Response.json();
+            const Parsed = ParseJSON(result)
+            console.log(result, Parsed)
+            clearInterval(loadingInterval)
+            OutputBox.innerHTML = Parsed
+        } catch (error) {
+            clearInterval(loadingInterval)
+            OutputBox.innerHTML = "Error fetching data."
+        }
     }
+    
     InputBox.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             QueryAccountDetails()

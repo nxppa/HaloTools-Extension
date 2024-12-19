@@ -62,7 +62,7 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px 0;
+    padding: 0px 0;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     height: 100vh;
     width: 50px;
@@ -76,7 +76,7 @@ h1 {
     margin: 10px 0;
     text-align: center;
     list-style: none;
-    line-height: 83px;
+    line-height: 77px;
 }
 .right-sidebar a img {
     width: 32px; /* Set the size of the icons */
@@ -103,6 +103,15 @@ h1 {
     margin-left: 17px; 
     margin-top: 22px;
 }
+.Actions {
+    margin-top: 15px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+}
+.ActionButton {
+    float: right;
+    width: 6%;
+}
 
 .input-box {
     width: 64%;
@@ -116,8 +125,7 @@ h1 {
     box-shadow: 0 0 10px 0px #4b4b4b; /* Initial glow */
     transition: box-shadow 0.5s ease; /* Smooth transition */
     outline: none; /* Removes the blue outline on focus */
-    font-family: 'Montserrat', sans-serif;
-
+    font-family: 'Fira Code', monospace;
 }
 
 .search-button {
@@ -134,7 +142,6 @@ h1 {
     cursor: pointer;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 0 10px 0px #ffd000; /* Initial glow */
-    font-family: 'Montserrat', sans-serif;
 
 }
 
@@ -159,7 +166,7 @@ h1 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     font-family: "Courier New", monospace;
     line-height: 1.5;
-    margin-top: 40px;
+    margin-top: 0px;
     opacity: 1; 
     box-shadow: 0 0 10px 0px #4b4b4b; /* Initial glow */
     transition: opacity 0.5s ease-in-out; /* Smooth fade-in */

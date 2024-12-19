@@ -1,11 +1,7 @@
-//34a75bef08004f789e548e709171c8822af6aec25b32260a169d2ac384746ecf8a01b6eb0ff56653d1e4fb5361e2f10495edea7ef56ef8d42884fea2b061e605
-//Nappa
-
-
-//b5f6ec4f48891b1cdd57fdedcd70b06efc21e34ffaccfce97f69bbe359885f7463e9ca3034ee89426ce396fba680ddca34b36797eb11164ebe0f8918ed615afd
-//sanya
-
-
+//* "If you make something so clusterfucked he can't understand it, he's gonna think you're a god" -- Terry A Davis *\\
+//9WD3qzitzsG43
+//EYWsnfIKgPg26
+//TODO make it so that session key is renewed every few seconds while extension open 
 
 function SemanticalVerify(key) { //TODO make it semantically verify based on length or whatever
     if (!key) {
@@ -17,19 +13,6 @@ function SemanticalVerify(key) { //TODO make it semantically verify based on len
 
 
 const AuthTimeMins = 8
-window.addEventListener('unload', () => {
-    const Token = localStorage.getItem('session_token')
-    const req = `https://bayharbour.boats/validate?token=${Token}`
-    fetch(req)
- })
- chrome.runtime.onConnect.addListener(function(port) {
-    if (port.name === "popup") {
-        port.onDisconnect.addListener(function() {
-            const req = `https://bayharbour.boats/validate?token=${Token}`
-            fetch(req)
-        });
-    }
-});
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -64,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const Token = localStorage.getItem('session_token')
         if (Token) {
             console.log(Token)
-            const req = `https://bayharbour.boats/validate?token=${Token}`
+            const req = `https://bayharbour.boats/validate?session_token=${Token}`
             console.log("validate req: ", req)
             const Response = await fetch(req)
             console.log(Response)
@@ -87,9 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     InputBox.focus()
-    async function ProccessEntry() { //TODO make ratelimit
+    async function ProccessEntry() {
         const password = InputBox.value;
-        if (SemanticalVerify(password)){
+        if (SemanticalVerify(password)){ //TODO make rate limits on client and server
             const Req = `https://bayharbour.boats/authenticate?key=${password}` 
             console.log("req: ", Req)
             const response = await fetch(Req);
@@ -113,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     const UnlockButton = document.querySelector('.unlock-button')
-    UnlockButton.addEventListener('click', async () => { //TODO make rate limits
+    UnlockButton.addEventListener('click', async () => {
         ProccessEntry()
     });
 })

@@ -1,4 +1,4 @@
-//* "If you make something so clusterfucked he can't understand it, he's gonna think you're a god" -- Terry A Davis *\\
+
 //9WD3qzitzsG43
 //EYWsnfIKgPg26
 //TODO make it so that session key is renewed every few seconds while extension open 

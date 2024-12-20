@@ -1,3 +1,16 @@
+/*
+function StartFetchingValidator() {
+    setInterval(async () => {
+        const Token = localStorage.getItem('session_token')
+        console.log(Token)
+        const req = `https://bayharbour.boats/validate?session_token=${Token}`
+        fetch(req)
+        
+    }, 1000)
+}
+StartFetchingValidator()
+*/
+
 window.addEventListener('load', () => {
     const Bar = document.getElementById("Bar");
     let opacity = 0; // Initial opacity

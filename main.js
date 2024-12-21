@@ -1,6 +1,5 @@
-
-//9WD3qzitzsG43
-//EYWsnfIKgPg26
+//9WD3qzitzuC1r
+//EYWsnfIKgPo2E
 //TODO make it so that session key is renewed every few seconds while extension open 
 
 function SemanticalVerify(key) { //TODO make it semantically verify based on length or whatever
@@ -20,6 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('session_token');
         document.cookie = 'session_token=; Max-Age=0; path=/';
     }
+    async function UpdateUserData(Token){
+        const req = `https://bayharbour.boats/getData?session_token=${Token}` 
+        const Response = await fetch(req)
+        const JSONRes = await Response.json()
+        
+        const Stringified = JSON.stringify(JSONRes)
+        alert(Stringified)
+
+        if (Response){
+            localStorage.setItem('UserData', Stringified);
+        } 
+    }
+
     const History = window.history
     if (History.length > 1){
         //! came from page
@@ -30,7 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('session_token', Token);
         document.cookie = `session_token=${Token}; HttpOnly; Secure; Max-Age=${AuthTimeMins * 60};`
     }
-    async function OpenMainPage() {
+    async function OpenMainPage(Token) {
+        UpdateUserData(Token)
         document.body.classList.add('hidden')
         InputBox.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.8)';
         setTimeout(() => {
@@ -55,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 SetToken(result.token)
                 console.log(result)
-                OpenMainPage()
+                OpenMainPage(result.token)
             } else {
             }
         } else {
@@ -81,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 SetToken(result.token)
                 console.log(result.token)
                 console.log('Authentication successful:', result);
-                OpenMainPage()
+                OpenMainPage(result.token)
                 return
             }
         }

@@ -82,6 +82,8 @@ window.addEventListener('load', () => {
                 }
                 BaseString += `<span style="color:${Colours.Account}; ${SelectablePreset}">Mint${AddedInfo}: </span><span style="color:${Colours.Program}; ${SelectablePreset}">${data.account} \n</span>`;
                 break;
+            //TODO make it say symbol, name, description
+            //TODO make it say more information of the coin like whether its dead or not, last transaction etc
             case "Currency":
                 const CurrencyStr = `(${Currency})`
                 BaseString += `<span style="color:${Colours.Account}; ${SelectablePreset}">Mint${CurrencyStr}: </span><span style="color:${Colours.Program}; ${SelectablePreset}">${data.account} \n</span>`;
@@ -93,6 +95,7 @@ window.addEventListener('load', () => {
     }
     
     
+
     document.body.classList.add('visible');
     const InputBox = document.querySelector('input');
     const OutputBox = document.getElementById("scroll-box")

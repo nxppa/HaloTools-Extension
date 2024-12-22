@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const JSONRes = await Response.json()
         
         const Stringified = JSON.stringify(JSONRes)
-        alert(Stringified)
+        //alert(Stringified)
 
         if (Response){
             localStorage.setItem('UserData', Stringified);
@@ -37,6 +37,8 @@ document.addEventListener('DOMContentLoaded', () => {
         //! came from page
         //TODO make it invalidate token on server if here
         ClearToken()
+        localStorage.clear();
+
     }
     async function SetToken(Token) {
         localStorage.setItem('session_token', Token);

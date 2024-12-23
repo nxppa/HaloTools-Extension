@@ -4,6 +4,15 @@ const PauseAssetIcon = "../../Assets/WalletCopying/Pause.png"
 const UnpauseAssetIcon = "../../Assets/WalletCopying/Unpause.png"
 
 let ActiveMapping = {}
+
+
+const Parameters = {
+    "Wallet": "Str",
+    "Alias": "Str",
+    "Max Proportion Spending": "Float",
+    "Max Market Cap Percentage": "Float",
+    "Priority Fee": "Float",
+}
 function shorthandString(str, numDots = 3, numStartChars = 4, numEndChars = 4) {
     if (str.length <= numStartChars + numEndChars + numDots) {
         return str
@@ -18,10 +27,26 @@ function getElementIndex(element) {
 }
 window.addEventListener('load', () => {
 
-
     document.body.classList.add('visible');
     const EditFrame = document.createElement('div');
     EditFrame.className = "EditFrame"
+
+    for (const k in Parameters){
+        const v = Parameters[k]
+        const PerameterHolder = document.createElement("div")
+        PerameterHolder.className = "PerameterHolder"
+        PerameterHolder.id = "paramHolder"+k
+        EditFrame.appendChild(PerameterHolder)
+        
+        const ParameterName = document.createElement("div")
+        ParameterName.className = "PerameterName"
+        ParameterName.id = "paramName"+k
+        ParameterName.innerText = k
+        PerameterHolder.appendChild(ParameterName)
+        
+    }
+
+
     let LastIndexedAt = null
     let PreviousWalletDiv = null
     EditFrame.classList.toggle('hidden');
@@ -89,20 +114,25 @@ window.addEventListener('load', () => {
         PauseStatus.type = "image"
         PauseStatus.className = "WalletIcon"
         IconsHolder.appendChild(PauseStatus)
-        PauseStatus.addEventListener("click", () => {
-            const Active = ActiveMapping[WalletAddress]
-            PauseStatus.src = Active ? UnpauseAssetIcon : PauseAssetIcon
-            ActiveMapping[WalletAddress] = !Active
-        })
+
 
 
         const WalletInfoHolder = document.createElement('div');
         WalletInfoHolder.className = "WalletInfoHolder"
         Wallet.appendChild(WalletInfoHolder)
 
-        const AddressName = document.createElement("div")
-        AddressName.className = "Names"
-        AddressName.textContent = shorthandString(WalletAddress, 3, 5, 5)
+        const AddressName = document.createElement("span");
+        AddressName.className = "Names";
+        
+        if (DataBaseData){
+            const Colour = DataBaseData.Valid ? (!DataBaseData.Halted ? "green" : "orange") : "red"
+            AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+        } else {
+            const Colour = "red"
+            AddressName.innerHTML = `Wallet Address\u2009<span style="color: ${Colour};">\u25C9</span>`;
+        }
+    
+
         WalletInfoHolder.appendChild(AddressName)
         AddressName["text-align"] = "center"
 
@@ -112,6 +142,14 @@ window.addEventListener('load', () => {
         WalletInfoHolder.appendChild(AliasName)
         AliasName["text-align"] = "center"
 
+        PauseStatus.addEventListener("click", () => {
+            ActiveMapping[WalletAddress] = !ActiveMapping[WalletAddress]
+            PauseStatus.src = ActiveMapping[WalletAddress] ? PauseAssetIcon : UnpauseAssetIcon
+            //TODO make it send req to database to post new information and get if valid
+            console.log(ActiveMapping[WalletAddress])
+            const Colour = DataBaseData.Valid ? (ActiveMapping[WalletAddress] ? "green" : "orange") : "red"
+            AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+        })
 
         if (!DataBaseData) {
             ActiveMapping[WalletAddress] = false
@@ -131,6 +169,10 @@ window.addEventListener('load', () => {
         const Data = Targets[Wallet]
         AddWalletDiv(Wallet, Data)
     }
+    const Plus = document.getElementById("Plus")
+    Plus.addEventListener("click", () => {
+        AddWalletDiv()
+    })
     //AddWalletDiv("ivsdbi981639879egfuwbefbwe018r", null, "Next Person")
 
 });

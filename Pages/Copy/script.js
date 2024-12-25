@@ -2,17 +2,50 @@ const PenAsset = "../../Assets/WalletCopying/Pen.png"
 const TrashAsset = "../../Assets/WalletCopying/Trash.png"
 const PauseAssetIcon = "../../Assets/WalletCopying/Pause.png"
 const UnpauseAssetIcon = "../../Assets/WalletCopying/Unpause.png"
-
+//EYWsnfIKgPo2E
 let ActiveMapping = {}
-
-
+let EditFrameKids = {}
+const BaseWalletTemplate = {
+    "PriorityFee": 0.0001,
+    "MaxProportionSpending": 0.05,
+    "MinimumSpending": 0.1,
+    "MaxMarketCap": 0.04,
+    "Halted": true,
+    "Alias": "Alias",
+    "Valid": false //TODO make server validate whether or not the wallet account is actually an account
+}
 const Parameters = {
     "Wallet": "Str",
     "Alias": "Str",
     "Max Proportion Spending": "Float",
     "Max Market Cap Percentage": "Float",
+    "Minimum Spending": "Float",
     "Priority Fee": "Float",
 }
+const ParamIDToAlias = {
+    "PriorityFee": "Priority Fee",
+    "MaxProportionSpending": "Max Proportion Spending",
+    "MinimumSpending": "Minimum Spending",
+    "Alias": "Alias",
+    "MaxMarketCap": "Max Market Cap Percentage",
+};
+
+const ParamAliasToID = {
+    "Priority Fee": "PriorityFee",
+    "Max Proportion Spending": "MaxProportionSpending",
+    "Minimum Spending": "MinimumSpending",
+    "Alias": "Alias",
+    "Max Market Cap Percentage": "MaxMarketCap",
+}
+async function post(URL, body) {
+    body = body || {};
+    return await fetch(URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    });
+}
+
 function shorthandString(str, numDots = 3, numStartChars = 4, numEndChars = 4) {
     if (str.length <= numStartChars + numEndChars + numDots) {
         return str
@@ -31,20 +64,34 @@ window.addEventListener('load', () => {
     const EditFrame = document.createElement('div');
     EditFrame.className = "EditFrame"
 
-    for (const k in Parameters){
+    for (const k in Parameters) {
         const v = Parameters[k]
         const PerameterHolder = document.createElement("div")
         PerameterHolder.className = "PerameterHolder"
-        PerameterHolder.id = "paramHolder"+k
+        PerameterHolder.id = "paramHolder" + k
         EditFrame.appendChild(PerameterHolder)
-        
-        const ParameterName = document.createElement("div")
-        ParameterName.className = "PerameterName"
-        ParameterName.id = "paramName"+k
+
+        const ParameterName = document.createElement("span")
+        ParameterName.className = "ParameterName"
+        ParameterName.id = "paramName" + k
         ParameterName.innerText = k
         PerameterHolder.appendChild(ParameterName)
+   
+        const ParameterInput = document.createElement("input")
+        ParameterInput.type = "text"
+        ParameterInput.className = "ParameterInput"
+        ParameterInput.id = "paramInput" + k
+
         
+        console.log(ParameterInput.placeholder)
+
+
+        ParameterInput.spellcheck = "false"
+        PerameterHolder.appendChild(ParameterInput)
+
+        EditFrameKids[k] = {Holder: PerameterHolder, NameDiv: ParameterName, Input: ParameterInput}
     }
+    
 
 
     let LastIndexedAt = null
@@ -53,7 +100,7 @@ window.addEventListener('load', () => {
     let EditFrameVisible = false
     const ScrollBox = document.getElementById("scroll-box")
     let WalletDivDex = 0
-    function AddWalletDiv(WalletAddress, DataBaseData, TempAlias = "Alias") {
+    function AddWalletDiv(WalletAddress, DataBaseData, Client) {
         WalletDivDex += 1
         const Wallet = document.createElement('div');
         const CurrentWalletDiv = WalletDivDex
@@ -74,32 +121,43 @@ window.addEventListener('load', () => {
         Pen.className = "WalletIcon"
         IconsHolder.appendChild(Pen)
 
-
-
-
         Pen.addEventListener("click", () => {
             const InsertAt = children[getElementIndex(Wallet) + 1]
             ScrollBox.insertBefore(EditFrame, InsertAt)
-            if (PreviousWalletDiv){
+
+            if (PreviousWalletDiv) {
                 PreviousWalletDiv.style.boxShadow = '0 0 10px 0px #4b4b4b'
             }
-                console.log(LastIndexedAt, CurrentWalletDiv, EditFrameVisible)
-                if (EditFrameVisible) {
-                    if (CurrentWalletDiv == LastIndexedAt){
-                        EditFrame.classList.toggle('hidden');
-                        EditFrameVisible = false
-                        Wallet.style.boxShadow = '0 0 10px 0px #4b4b4b';
-                    } else {
-                        Wallet.style.boxShadow = '0 0 20px #FFBD59';
-                    }
-                } else {
+            console.log(LastIndexedAt, CurrentWalletDiv, EditFrameVisible)
+            if (EditFrameVisible) {
+                if (CurrentWalletDiv == LastIndexedAt) {
                     EditFrame.classList.toggle('hidden');
-                    EditFrameVisible = true
+                    EditFrameVisible = false
+                    Wallet.style.boxShadow = '0 0 10px 0px #4b4b4b';
+                } else {
                     Wallet.style.boxShadow = '0 0 20px #FFBD59';
-
                 }
-                PreviousWalletDiv = Wallet 
+            } else {
+                EditFrame.classList.toggle('hidden');
+                EditFrameVisible = true
+                Wallet.style.boxShadow = '0 0 20px #FFBD59';
+
+            }
+            PreviousWalletDiv = Wallet
             LastIndexedAt = CurrentWalletDiv
+            console.log(EditFrameVisible)
+            if (EditFrameVisible){
+                EditFrameKids["Wallet"].Input.value = WalletAddress
+                for (const k in DataBaseData){
+                    const Alias = ParamIDToAlias[k]
+                    if (Parameters[Alias]){
+                        console.log(k)
+                        
+                        EditFrameKids[Alias].Input.value = DataBaseData[k]
+                    }
+                    
+                }
+            }
         })
 
 
@@ -123,55 +181,82 @@ window.addEventListener('load', () => {
 
         const AddressName = document.createElement("span");
         AddressName.className = "Names";
-        
-        if (DataBaseData){
+
+        if (!Client) {
             const Colour = DataBaseData.Valid ? (!DataBaseData.Halted ? "green" : "orange") : "red"
             AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
         } else {
             const Colour = "red"
-            AddressName.innerHTML = `Wallet Address\u2009<span style="color: ${Colour};">\u25C9</span>`;
+            AddressName.innerHTML = `${WalletAddress}\u2009<span style="color: ${Colour};">\u25C9</span>`;
         }
-    
+
 
         WalletInfoHolder.appendChild(AddressName)
         AddressName["text-align"] = "center"
 
         const AliasName = document.createElement("div")
         AliasName.className = "Names"
-        AliasName.textContent = TempAlias
+        AliasName.textContent = DataBaseData.Alias
         WalletInfoHolder.appendChild(AliasName)
         AliasName["text-align"] = "center"
+        Trash.addEventListener("click", () => {
+            const Token = localStorage.getItem('session_token')
+            const UserData = localStorage.getItem('UserData')
+            const UserDataParsed = JSON.parse(UserData)
+            delete UserDataParsed.Targets[WalletAddress]
+            localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+            const URL = `https://bayharbour.boats/removeWallet?session_token=${Token}&account=${WalletAddress}`
+            post(URL)
+            Wallet.remove()
 
+        })
         PauseStatus.addEventListener("click", () => {
+            if (DataBaseData.Valid){
+
             ActiveMapping[WalletAddress] = !ActiveMapping[WalletAddress]
             PauseStatus.src = ActiveMapping[WalletAddress] ? PauseAssetIcon : UnpauseAssetIcon
             //TODO make it send req to database to post new information and get if valid
+            const Token = localStorage.getItem('session_token')
+            const UserData = localStorage.getItem('UserData')
+            const UserDataParsed = JSON.parse(UserData)
+            UserDataParsed.Targets[WalletAddress].Halted = !ActiveMapping[WalletAddress]
+            localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+            const URL = `https://bayharbour.boats/setValue?session_token=${Token}&account=${WalletAddress}&param=Halted&value=${!ActiveMapping[WalletAddress]}`
+            post(URL)
             console.log(ActiveMapping[WalletAddress])
             const Colour = DataBaseData.Valid ? (ActiveMapping[WalletAddress] ? "green" : "orange") : "red"
             AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+        }
         })
 
-        if (!DataBaseData) {
-            ActiveMapping[WalletAddress] = false
-            PauseStatus.src = UnpauseAssetIcon
-        } else {
-            //TODO
-            AliasName.textContent = DataBaseData.Alias
-            PauseStatus.src = DataBaseData.Halted ? UnpauseAssetIcon : PauseAssetIcon
-            ActiveMapping[WalletAddress] = !DataBaseData.Halted
-        }
+
+        PauseStatus.src = DataBaseData.Halted ? UnpauseAssetIcon : PauseAssetIcon
+        ActiveMapping[WalletAddress] = !DataBaseData.Halted
     }
     const UserData = localStorage.getItem('UserData')
     const UserDataParsed = JSON.parse(UserData)
-    console.log(UserDataParsed, UserDataParsed.Targets)
+
     const Targets = UserDataParsed.Targets
     for (const Wallet in Targets) {
         const Data = Targets[Wallet]
         AddWalletDiv(Wallet, Data)
     }
+    console.log(Targets)
     const Plus = document.getElementById("Plus")
     Plus.addEventListener("click", () => {
-        AddWalletDiv()
+        console.log(Targets)
+        const length = Object.keys(Targets).length + 1
+        const NewName = "Address-" + length
+        Targets[NewName] = BaseWalletTemplate
+        AddWalletDiv(NewName, BaseWalletTemplate, true)
+        const UserData = localStorage.getItem('UserData')
+        const UserDataParsed = JSON.parse(UserData)
+        UserDataParsed.Targets[NewName] = BaseWalletTemplate
+        localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+        const Token = localStorage.getItem('session_token')
+        const URL = `https://bayharbour.boats/newWallet?session_token=${Token}&account=${NewName}`
+        post(URL, BaseWalletTemplate)
+
     })
     //AddWalletDiv("ivsdbi981639879egfuwbefbwe018r", null, "Next Person")
 

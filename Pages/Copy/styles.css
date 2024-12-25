@@ -184,11 +184,48 @@ h1 {
 }
 .PerameterHolder {
     width: 100%;
-    border: 1px solid #444444;
-    height: 40px;
-    margin-bottom: 10px;
+    /* border: 1px solid #444444; */
+    height: 35px;
+    margin-bottom: 2px;
+    display: flex; /* Enable Flexbox layout */
+    gap: 10px; /* Optional: Add spacing between left and right elements */
+    
+}
+.ParameterInput::selection{
+    background-color: #FFBD59; /* Highlight background color */
+    color: #000000; /* Highlighted text color */
+}
+.ParameterName {
+    flex: 0 1 auto; /* Take only as much space as needed */
+    display: flex; /* Align content within left element */
+    align-items: center; /* Default alignment */
+    justify-content: flex-start; /* Optional: Ensure content stays left-aligned */
+    height: 100%;
+    line-height: 35px; /* Adjust the line-height to center or lower the text */
+    font-size: 15px;
+}
+
+
+.ParameterInput{
+    width: 100%; /* Ensure input spans the full width of the parent */
+    text-align: right; /* Align text inside the input to the right */
+    padding: 5px; /* Add padding inside the input */
+    box-sizing: border-box; /* Include padding in the input's width */
+    background: none; /* Remove the background */
+    outline: none; /* Remove the focus outline */
+    border: none; /* Remove the default border */
+    color: #FFBD59;
+    border-bottom: 2px solid #FFBD59
+ /* Change border color when focused */
 
 }
+ParameterInput input:focus{
+    outline: none; /* Remove the focus outline */
+    border: none; /* Prevent any border from appearing */
+    border-bottom: 2px solid #FFBD59
+ /* Change border color when focused */
+}
+
 .WalletHolder {
     position: relative;
     width: 100%;

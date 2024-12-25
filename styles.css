@@ -110,6 +110,10 @@ h1 {
     font-family: 'Montserrat', sans-serif;
 
 }
+.input-box::selection{
+        background-color: #FFBD59; /* Highlight background color */
+        color: #000000; /* Highlighted text color */
+}
 
 .footer {
     text-align: center;

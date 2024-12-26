@@ -65,7 +65,6 @@ window.addEventListener('load', () => {
     EditFrame.className = "EditFrame"
 
     for (const k in Parameters) {
-        const v = Parameters[k]
         const PerameterHolder = document.createElement("div")
         PerameterHolder.className = "PerameterHolder"
         PerameterHolder.id = "paramHolder" + k
@@ -76,23 +75,32 @@ window.addEventListener('load', () => {
         ParameterName.id = "paramName" + k
         ParameterName.innerText = k
         PerameterHolder.appendChild(ParameterName)
-   
+
         const ParameterInput = document.createElement("input")
         ParameterInput.type = "text"
         ParameterInput.className = "ParameterInput"
         ParameterInput.id = "paramInput" + k
 
-        
+
         console.log(ParameterInput.placeholder)
 
 
         ParameterInput.spellcheck = "false"
         PerameterHolder.appendChild(ParameterInput)
 
-        EditFrameKids[k] = {Holder: PerameterHolder, NameDiv: ParameterName, Input: ParameterInput}
+        EditFrameKids[k] = { Holder: PerameterHolder, NameDiv: ParameterName, Input: ParameterInput }
     }
-    
+    const ConfirmButton = document.createElement("button")
+    ConfirmButton.className = "Confirm"
+    ConfirmButton.textContent = "Confirm"
+    EditFrame.appendChild(ConfirmButton)
+    ConfirmButton.addEventListener("click", () => {
+        EditFrame.classList.toggle('hidden');
+        EditFrameVisible.style.boxShadow = '0 0 10px 0px #4b4b4b';
+        EditFrameVisible = false 
 
+        //TODO parse updates
+    })
 
     let LastIndexedAt = null
     let PreviousWalletDiv = null
@@ -139,23 +147,23 @@ window.addEventListener('load', () => {
                 }
             } else {
                 EditFrame.classList.toggle('hidden');
-                EditFrameVisible = true
+                EditFrameVisible = Wallet
                 Wallet.style.boxShadow = '0 0 20px #FFBD59';
 
             }
             PreviousWalletDiv = Wallet
             LastIndexedAt = CurrentWalletDiv
             console.log(EditFrameVisible)
-            if (EditFrameVisible){
+            if (EditFrameVisible) {
                 EditFrameKids["Wallet"].Input.value = WalletAddress
-                for (const k in DataBaseData){
+                for (const k in DataBaseData) {
                     const Alias = ParamIDToAlias[k]
-                    if (Parameters[Alias]){
+                    if (Parameters[Alias]) {
                         console.log(k)
-                        
+
                         EditFrameKids[Alias].Input.value = DataBaseData[k]
                     }
-                    
+
                 }
             }
         })
@@ -200,6 +208,7 @@ window.addEventListener('load', () => {
         WalletInfoHolder.appendChild(AliasName)
         AliasName["text-align"] = "center"
         Trash.addEventListener("click", () => {
+
             const Token = localStorage.getItem('session_token')
             const UserData = localStorage.getItem('UserData')
             const UserDataParsed = JSON.parse(UserData)
@@ -208,25 +217,27 @@ window.addEventListener('load', () => {
             const URL = `https://bayharbour.boats/removeWallet?session_token=${Token}&account=${WalletAddress}`
             post(URL)
             Wallet.remove()
-
+            if (EditFrameVisible && CurrentWalletDiv == LastIndexedAt) {
+                EditFrame.classList.toggle('hidden');
+                EditFrameVisible = false
+            }
         })
         PauseStatus.addEventListener("click", () => {
-            if (DataBaseData.Valid){
-
-            ActiveMapping[WalletAddress] = !ActiveMapping[WalletAddress]
-            PauseStatus.src = ActiveMapping[WalletAddress] ? PauseAssetIcon : UnpauseAssetIcon
-            //TODO make it send req to database to post new information and get if valid
-            const Token = localStorage.getItem('session_token')
-            const UserData = localStorage.getItem('UserData')
-            const UserDataParsed = JSON.parse(UserData)
-            UserDataParsed.Targets[WalletAddress].Halted = !ActiveMapping[WalletAddress]
-            localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
-            const URL = `https://bayharbour.boats/setValue?session_token=${Token}&account=${WalletAddress}&param=Halted&value=${!ActiveMapping[WalletAddress]}`
-            post(URL)
-            console.log(ActiveMapping[WalletAddress])
-            const Colour = DataBaseData.Valid ? (ActiveMapping[WalletAddress] ? "green" : "orange") : "red"
-            AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
-        }
+            if (DataBaseData.Valid) {
+                ActiveMapping[WalletAddress] = !ActiveMapping[WalletAddress]
+                PauseStatus.src = ActiveMapping[WalletAddress] ? PauseAssetIcon : UnpauseAssetIcon
+                //TODO make it send req to database to post new information and get if valid
+                const Token = localStorage.getItem('session_token')
+                const UserData = localStorage.getItem('UserData')
+                const UserDataParsed = JSON.parse(UserData)
+                UserDataParsed.Targets[WalletAddress].Halted = !ActiveMapping[WalletAddress]
+                localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+                const URL = `https://bayharbour.boats/setValue?session_token=${Token}&account=${WalletAddress}&param=Halted&value=${!ActiveMapping[WalletAddress]}`
+                post(URL)
+                console.log(ActiveMapping[WalletAddress])
+                const Colour = DataBaseData.Valid ? (ActiveMapping[WalletAddress] ? "green" : "orange") : "red"
+                AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+            }
         })
 
 

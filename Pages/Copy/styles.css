@@ -22,18 +22,11 @@ body {
     color: white;
     display: flex;
     flex-direction: column;
-    /* Stack items vertically */
     justify-content: flex-start;
-    /* Align items vertically to the top */
     align-items: center;
-    /* Center items horizontally */
     height: 600px;
-    /* Fixed height */
     width: 360px;
-    /* Fixed width */
     overflow: hidden;
-    /* Prevent scrolling */
-
     opacity: 1;
     /* Initial state: fully transparent */
     transition: opacity 1s ease-in;
@@ -261,16 +254,28 @@ ParameterInput input:focus{
 
 .Plus {
     top: 5px;
-    /* Adjust as needed for spacing */
     right: 50px;
-    /* Adjust as needed for spacing */
     width: 20px;
-    /* Example size */
     height: 20px;
-    /* Example size */
     float: right;
-    /* Aligns the element to the right */
 
+}
+.Confirm {
+    width: 100%;
+    padding: 0; /* Remove padding */
+    background-color: #FFBD59;
+    color: rgb(73, 73, 73);
+    font-size: 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    font-family: 'Montserrat', sans-serif;
+    margin-top: 10px;
+    height: 37px;
+    text-align: center; /* Align text to the center horizontally */
+    line-height: 37px; /* Match the button height for vertical alignment */
 }
 
 .IconsHolder {

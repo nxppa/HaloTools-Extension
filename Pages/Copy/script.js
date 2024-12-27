@@ -81,10 +81,6 @@ window.addEventListener('load', () => {
         ParameterInput.className = "ParameterInput"
         ParameterInput.id = "paramInput" + k
 
-
-        console.log(ParameterInput.placeholder)
-
-
         ParameterInput.spellcheck = "false"
         PerameterHolder.appendChild(ParameterInput)
 
@@ -96,10 +92,22 @@ window.addEventListener('load', () => {
     EditFrame.appendChild(ConfirmButton)
     ConfirmButton.addEventListener("click", () => {
         EditFrame.classList.toggle('hidden');
-        EditFrameVisible.style.boxShadow = '0 0 10px 0px #4b4b4b';
+        EditFrameVisible.Wallet.style.boxShadow = '0 0 10px 0px #4b4b4b';
+        let VariablesParsed = {}
+        for (const k in EditFrameKids){
+            const Frame = EditFrameKids[k]
+            VariablesParsed[k] = Frame.Input.value
+        }
+        const Colour = "red" //TODO either ask server to validate or validate on client 
+        WalletAddress = VariablesParsed.Wallet
+        EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(VariablesParsed.Wallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+        EditFrameVisible.AliasLabel.textContent = VariablesParsed.Alias
+
+        //EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName}
+        
+        //TODO parse updates to local storage and server
         EditFrameVisible = false 
 
-        //TODO parse updates
     })
 
     let LastIndexedAt = null
@@ -128,45 +136,6 @@ window.addEventListener('load', () => {
         Pen.src = PenAsset
         Pen.className = "WalletIcon"
         IconsHolder.appendChild(Pen)
-
-        Pen.addEventListener("click", () => {
-            const InsertAt = children[getElementIndex(Wallet) + 1]
-            ScrollBox.insertBefore(EditFrame, InsertAt)
-
-            if (PreviousWalletDiv) {
-                PreviousWalletDiv.style.boxShadow = '0 0 10px 0px #4b4b4b'
-            }
-            console.log(LastIndexedAt, CurrentWalletDiv, EditFrameVisible)
-            if (EditFrameVisible) {
-                if (CurrentWalletDiv == LastIndexedAt) {
-                    EditFrame.classList.toggle('hidden');
-                    EditFrameVisible = false
-                    Wallet.style.boxShadow = '0 0 10px 0px #4b4b4b';
-                } else {
-                    Wallet.style.boxShadow = '0 0 20px #FFBD59';
-                }
-            } else {
-                EditFrame.classList.toggle('hidden');
-                EditFrameVisible = Wallet
-                Wallet.style.boxShadow = '0 0 20px #FFBD59';
-
-            }
-            PreviousWalletDiv = Wallet
-            LastIndexedAt = CurrentWalletDiv
-            console.log(EditFrameVisible)
-            if (EditFrameVisible) {
-                EditFrameKids["Wallet"].Input.value = WalletAddress
-                for (const k in DataBaseData) {
-                    const Alias = ParamIDToAlias[k]
-                    if (Parameters[Alias]) {
-                        console.log(k)
-
-                        EditFrameKids[Alias].Input.value = DataBaseData[k]
-                    }
-
-                }
-            }
-        })
 
 
 
@@ -234,11 +203,50 @@ window.addEventListener('load', () => {
                 localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
                 const URL = `https://bayharbour.boats/setValue?session_token=${Token}&account=${WalletAddress}&param=Halted&value=${!ActiveMapping[WalletAddress]}`
                 post(URL)
-                console.log(ActiveMapping[WalletAddress])
                 const Colour = DataBaseData.Valid ? (ActiveMapping[WalletAddress] ? "green" : "orange") : "red"
                 AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
             }
         })
+        Pen.addEventListener("click", () => {
+            const InsertAt = children[getElementIndex(Wallet) + 1]
+            ScrollBox.insertBefore(EditFrame, InsertAt)
+            if (PreviousWalletDiv) {
+                PreviousWalletDiv.style.boxShadow = '0 0 10px 0px #4b4b4b'
+            }
+            if (EditFrameVisible) {
+                if (CurrentWalletDiv == LastIndexedAt) {
+                    EditFrame.classList.toggle('hidden');
+                    EditFrameVisible = false
+                    Wallet.style.boxShadow = '0 0 10px 0px #4b4b4b';
+                } else {
+                    Wallet.style.boxShadow = '0 0 20px #FFBD59';
+                }
+            } else {
+                EditFrame.classList.toggle('hidden');
+                EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName, OriginalAccount: WalletAddress}
+                Wallet.style.boxShadow = '0 0 20px #FFBD59';
+
+            }
+            PreviousWalletDiv = Wallet
+            LastIndexedAt = CurrentWalletDiv
+            const UserData = localStorage.getItem('UserData')
+            const UserDataParsed = JSON.parse(UserData)
+            const CurrentTargets = UserDataParsed.Targets
+            const CurrentTarget = CurrentTargets[WalletAddress]
+
+            if (EditFrameVisible) {
+                EditFrameKids["Wallet"].Input.value = WalletAddress
+                for (const k in DataBaseData) {
+                    const Alias = ParamIDToAlias[k]
+                    console.log(CurrentTarget[k])
+                    if (Parameters[Alias]) {
+                        EditFrameKids[Alias].Input.value = CurrentTarget[k]
+                    }
+
+                }
+            }
+        })
+
 
 
         PauseStatus.src = DataBaseData.Halted ? UnpauseAssetIcon : PauseAssetIcon

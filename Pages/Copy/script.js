@@ -45,7 +45,17 @@ async function post(URL, body) {
         body: JSON.stringify(body),
     });
 }
+function ChangeWalletAddress(Original, New){
+    const UserData = localStorage.getItem('UserData')
+    const UserDataParsed = JSON.parse(UserData)
+    UserDataParsed[New] = UserDataParsed[Original]
+    delete UserDataParsed[Original]
+    localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+    const URL = `https://bayharbour.boats/setWalletAddress?session_token=${Token}&old=${Original}&new=${New}`
+    post(URL)
 
+    return UserDataParsed
+}
 function shorthandString(str, numDots = 3, numStartChars = 4, numEndChars = 4) {
     if (str.length <= numStartChars + numEndChars + numDots) {
         return str
@@ -103,6 +113,7 @@ window.addEventListener('load', () => {
         EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(VariablesParsed.Wallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
         EditFrameVisible.AliasLabel.textContent = VariablesParsed.Alias
 
+        
         //EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName}
         
         //TODO parse updates to local storage and server

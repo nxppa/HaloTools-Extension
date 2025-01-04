@@ -45,15 +45,23 @@ async function post(URL, body) {
         body: JSON.stringify(body),
     });
 }
+function SetDictionaryItem(Item, Dictionary){
+    localStorage.setItem(Item, JSON.stringify(Dictionary))
+}
+function GetDictionaryItem(Item){
+    const UserData = localStorage.getItem(Item)
+    const DataParsed = JSON.parse(UserData)
+    return DataParsed
+}
+
 function ChangeWalletAddress(EditFrameVis, New, Data){
     const Original = EditFrameVis.Wallet.id
-    EditFrameVis.id = New
-    const UserData = localStorage.getItem('UserData')
-    const UserDataParsed = JSON.parse(UserData)
-    UserDataParsed.Targets[New] = UserDataParsed.Targets[Original]
-    delete UserDataParsed.Targets[Original]
-    console.log("data: ", UserDataParsed)
-    localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+    EditFrameVis.Wallet.id = New
+    const UserData = GetDictionaryItem("UserData")
+    UserData.Targets[New] = UserData.Targets[Original]
+    delete UserData.Targets[Original]
+    console.log("data: ", UserData)
+    SetDictionaryItem("UserData", UserData)
     const Token = localStorage.getItem('session_token')
     const URL = `https://bayharbour.boats/setWalletAddress?session_token=${Token}&old=${Original}&new=${New}`
     const response = post(URL, Data)
@@ -63,20 +71,33 @@ function ChangeWalletAddress(EditFrameVis, New, Data){
         data => {
             console.log("IsValid: ", data.IsValid)
             if (data.IsValid){
-                //TODO tell userdata and interface it is valid
+                const UserData = GetDictionaryItem("UserData")
+                UserData.Targets[New].Valid = true
+                SetDictionaryItem("UserData", UserData)
+                const Colour = "orange"
+                EditFrameVis.WalletLabel.innerHTML = `${shorthandString(New, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+            } else {
+                //! not valid
+                const UserData = GetDictionaryItem("UserData")
+                UserData.Targets[New].Valid = false
+                SetDictionaryItem("UserData", UserData)
+                const Colour = "red"
+                EditFrameVis.WalletLabel.innerHTML = `${shorthandString(New, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
             }
+            UserData.Targets[New].Halted = true
+            EditFrameVis.PauseIcon.src = UnpauseAssetIcon
         }
     )
-    return UserDataParsed
+    return UserData
 }
 
-function SetWalletDetails(Wallet, Details){
-    const UserData = localStorage.getItem('UserData')
-    const UserDataParsed = JSON.parse(UserData)
-    UserDataParsed.Targets[Wallet] = Details
-    localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+function SetWalletDetails(Frame, Details){
+    const id = Frame.Wallet.id
+    const UserData = GetDictionaryItem("UserData")
+    UserData.Targets[id] = Details
+    SetDictionaryItem("UserData", UserData)
     const Token = localStorage.getItem('session_token')
-    const URL = `https://bayharbour.boats/setValues?session_token=${Token}&account=${Wallet}`
+    const URL = `https://bayharbour.boats/setValues?session_token=${Token}&account=${id}`
     post(URL, Details)
 }
 function shorthandString(str, numDots = 3, numStartChars = 4, numEndChars = 4) {
@@ -161,20 +182,20 @@ window.addEventListener('load', () => {
 
         const NewWallet = EditFrameKids["Wallet"].Input.value
         //TODO make checks to see if wallet inputs are valid
-        const UserData = localStorage.getItem('UserData')
-        const UserDataParsed = JSON.parse(UserData)        
-        VariablesParsed.Halted = UserDataParsed.Targets[EditFrameVisible.Wallet.id].Halted
-        const Colour = "red" //TODO either ask server to validate or validate on client 
+
+        const UserData = GetDictionaryItem("UserData")
+        VariablesParsed.Halted = UserData.Targets[EditFrameVisible.Wallet.id].Halted
+        const Colour = "grey"
         EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(NewWallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
         EditFrameVisible.AliasLabel.textContent = VariablesParsed.Alias
-        
+        ActiveMapping[EditFrameVisible.Wallet.id] = false
         
         //EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName}
 
         if (EditFrameVisible.Wallet.id != NewWallet){
             ChangeWalletAddress(EditFrameVisible, NewWallet, VariablesParsed)
         } else {
-            SetWalletDetails(EditFrameVisible.Wallet.id, VariablesParsed)
+            SetWalletDetails(EditFrameVisible, VariablesParsed)
         }
 
         //TODO parse updates to local storage and server
@@ -251,10 +272,9 @@ window.addEventListener('load', () => {
         Trash.addEventListener("click", () => {
 
             const Token = localStorage.getItem('session_token')
-            const UserData = localStorage.getItem('UserData')
-            const UserDataParsed = JSON.parse(UserData)
-            delete UserDataParsed.Targets[Wallet.id]
-            localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+            const UserData = GetDictionaryItem("UserData")
+            delete UserData.Targets[Wallet.id]
+            SetDictionaryItem("UserData", UserData)
             const URL = `https://bayharbour.boats/removeWallet?session_token=${Token}&account=${Wallet.id}`
             post(URL)
             Wallet.remove()
@@ -264,18 +284,20 @@ window.addEventListener('load', () => {
             }
         })
         PauseStatus.addEventListener("click", () => {
-            if (DataBaseData.Valid) {
+            const UserData = GetDictionaryItem("UserData")
+            const WalletData = UserData.Targets[Wallet.id]
+            console.log(Wallet.id, UserData)
+            if (WalletData.Valid) {
                 ActiveMapping[Wallet.id] = !ActiveMapping[Wallet.id]
                 PauseStatus.src = ActiveMapping[Wallet.id] ? PauseAssetIcon : UnpauseAssetIcon
                 //TODO make it send req to database to post new information and get if valid
                 const Token = localStorage.getItem('session_token')
-                const UserData = localStorage.getItem('UserData')
-                const UserDataParsed = JSON.parse(UserData)
-                UserDataParsed.Targets[Wallet.id].Halted = !ActiveMapping[Wallet.id]
-                localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+                const UserData = GetDictionaryItem("UserData")
+                UserData.Targets[Wallet.id].Halted = !ActiveMapping[Wallet.id]
+                SetDictionaryItem("UserData", UserData)
                 const URL = `https://bayharbour.boats/setValue?session_token=${Token}&account=${Wallet.id}&param=Halted&value=${!ActiveMapping[Wallet.id]}`
                 post(URL)
-                const Colour = DataBaseData.Valid ? (ActiveMapping[Wallet.id] ? "green" : "orange") : "red"
+                const Colour = WalletData.Valid ? (ActiveMapping[Wallet.id] ? "green" : "orange") : "red"
                 AddressName.innerHTML = `${shorthandString(Wallet.id, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
             }
         })
@@ -295,17 +317,15 @@ window.addEventListener('load', () => {
                 }
             } else {
                 EditFrame.classList.toggle('hidden');
-                EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName, OriginalAccount: Wallet.id}
+                EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName, OriginalAccount: Wallet.id, PauseIcon: PauseStatus}
                 Wallet.style.boxShadow = '0 0 20px #FFBD59';
 
             }
             PreviousWalletDiv = Wallet
             LastIndexedAt = CurrentWalletDiv
-            const UserData = localStorage.getItem('UserData')
-            const UserDataParsed = JSON.parse(UserData)
-            const CurrentTargets = UserDataParsed.Targets
+            const UserData = GetDictionaryItem("UserData")
+            const CurrentTargets = UserData.Targets
             const CurrentTarget = CurrentTargets[Wallet.id]
-
             if (EditFrameVisible) {
                 EditFrameKids["Wallet"].Input.value = Wallet.id
                 for (const k in DataBaseData) {
@@ -324,10 +344,9 @@ window.addEventListener('load', () => {
         PauseStatus.src = DataBaseData.Halted ? UnpauseAssetIcon : PauseAssetIcon
         ActiveMapping[Wallet.id] = !DataBaseData.Halted
     }
-    const UserData = localStorage.getItem('UserData')
-    const UserDataParsed = JSON.parse(UserData)
+    const UserData = GetDictionaryItem("UserData")
 
-    const Targets = UserDataParsed.Targets
+    const Targets = UserData.Targets
     for (const Wallet in Targets) {
         const Data = Targets[Wallet]
         AddWalletDiv(Wallet, Data)
@@ -340,10 +359,9 @@ window.addEventListener('load', () => {
         const NewName = "Address-" + length
         Targets[NewName] = BaseWalletTemplate
         AddWalletDiv(NewName, BaseWalletTemplate, true)
-        const UserData = localStorage.getItem('UserData')
-        const UserDataParsed = JSON.parse(UserData)
-        UserDataParsed.Targets[NewName] = BaseWalletTemplate
-        localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+        const UserData = GetDictionaryItem("UserData")
+        UserData.Targets[NewName] = BaseWalletTemplate
+        SetDictionaryItem("UserData", UserData)
         const Token = localStorage.getItem('session_token')
         const URL = `https://bayharbour.boats/newWallet?session_token=${Token}&account=${NewName}`
         post(URL, BaseWalletTemplate)

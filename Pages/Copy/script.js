@@ -45,16 +45,39 @@ async function post(URL, body) {
         body: JSON.stringify(body),
     });
 }
-function ChangeWalletAddress(Original, New){
+function ChangeWalletAddress(EditFrameVis, New, Data){
+    const Original = EditFrameVis.Wallet.id
+    EditFrameVis.id = New
     const UserData = localStorage.getItem('UserData')
     const UserDataParsed = JSON.parse(UserData)
-    UserDataParsed[New] = UserDataParsed[Original]
-    delete UserDataParsed[Original]
+    UserDataParsed.Targets[New] = UserDataParsed.Targets[Original]
+    delete UserDataParsed.Targets[Original]
+    console.log("data: ", UserDataParsed)
     localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+    const Token = localStorage.getItem('session_token')
     const URL = `https://bayharbour.boats/setWalletAddress?session_token=${Token}&old=${Original}&new=${New}`
-    post(URL)
-
+    const response = post(URL, Data)
+    response.then(res => {
+        return res.json()
+    }).then(
+        data => {
+            console.log("IsValid: ", data.IsValid)
+            if (data.IsValid){
+                //TODO tell userdata and interface it is valid
+            }
+        }
+    )
     return UserDataParsed
+}
+
+function SetWalletDetails(Wallet, Details){
+    const UserData = localStorage.getItem('UserData')
+    const UserDataParsed = JSON.parse(UserData)
+    UserDataParsed.Targets[Wallet] = Details
+    localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
+    const Token = localStorage.getItem('session_token')
+    const URL = `https://bayharbour.boats/setValues?session_token=${Token}&account=${Wallet}`
+    post(URL, Details)
 }
 function shorthandString(str, numDots = 3, numStartChars = 4, numEndChars = 4) {
     if (str.length <= numStartChars + numEndChars + numDots) {
@@ -67,6 +90,29 @@ function shorthandString(str, numDots = 3, numStartChars = 4, numEndChars = 4) {
 }
 function getElementIndex(element) {
     return Array.from(element.parentNode.children).indexOf(element);
+}
+const DataMap = {
+    "PriorityFee": "float",
+    "MaxProportionSpending": "float",
+    "MinimumSpending": "float",
+    "MaxMarketCap": "float",
+    "Halted": "boolean",
+    "Valid": "boolean",
+    "Alias": "string",
+}
+function convertValue(param, value) {
+    console.log("pv:", param, value)
+    const type = DataMap[param];
+    switch (type) {
+        case "float":
+            return parseFloat(value);
+        case "boolean":
+            return value === "true" || value === true;
+        case "string":
+            return String(value);
+        default:
+            throw new Error(`Unsupported type for param: ${param}`);
+    }
 }
 window.addEventListener('load', () => {
 
@@ -106,16 +152,31 @@ window.addEventListener('load', () => {
         let VariablesParsed = {}
         for (const k in EditFrameKids){
             const Frame = EditFrameKids[k]
-            VariablesParsed[k] = Frame.Input.value
+            console.log("parsed: ", k)
+            const Actual = ParamAliasToID[k]
+            if (Actual){
+                VariablesParsed[Actual] = Frame.Input.value
+            }
         }
-        const Colour = "red" //TODO either ask server to validate or validate on client 
-        WalletAddress = VariablesParsed.Wallet
-        EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(VariablesParsed.Wallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
-        EditFrameVisible.AliasLabel.textContent = VariablesParsed.Alias
 
+        const NewWallet = EditFrameKids["Wallet"].Input.value
+        //TODO make checks to see if wallet inputs are valid
+        const UserData = localStorage.getItem('UserData')
+        const UserDataParsed = JSON.parse(UserData)        
+        VariablesParsed.Halted = UserDataParsed.Targets[EditFrameVisible.Wallet.id].Halted
+        const Colour = "red" //TODO either ask server to validate or validate on client 
+        EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(NewWallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+        EditFrameVisible.AliasLabel.textContent = VariablesParsed.Alias
+        
         
         //EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName}
-        
+
+        if (EditFrameVisible.Wallet.id != NewWallet){
+            ChangeWalletAddress(EditFrameVisible, NewWallet, VariablesParsed)
+        } else {
+            SetWalletDetails(EditFrameVisible.Wallet.id, VariablesParsed)
+        }
+
         //TODO parse updates to local storage and server
         EditFrameVisible = false 
 
@@ -192,9 +253,9 @@ window.addEventListener('load', () => {
             const Token = localStorage.getItem('session_token')
             const UserData = localStorage.getItem('UserData')
             const UserDataParsed = JSON.parse(UserData)
-            delete UserDataParsed.Targets[WalletAddress]
+            delete UserDataParsed.Targets[Wallet.id]
             localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
-            const URL = `https://bayharbour.boats/removeWallet?session_token=${Token}&account=${WalletAddress}`
+            const URL = `https://bayharbour.boats/removeWallet?session_token=${Token}&account=${Wallet.id}`
             post(URL)
             Wallet.remove()
             if (EditFrameVisible && CurrentWalletDiv == LastIndexedAt) {
@@ -204,18 +265,18 @@ window.addEventListener('load', () => {
         })
         PauseStatus.addEventListener("click", () => {
             if (DataBaseData.Valid) {
-                ActiveMapping[WalletAddress] = !ActiveMapping[WalletAddress]
-                PauseStatus.src = ActiveMapping[WalletAddress] ? PauseAssetIcon : UnpauseAssetIcon
+                ActiveMapping[Wallet.id] = !ActiveMapping[Wallet.id]
+                PauseStatus.src = ActiveMapping[Wallet.id] ? PauseAssetIcon : UnpauseAssetIcon
                 //TODO make it send req to database to post new information and get if valid
                 const Token = localStorage.getItem('session_token')
                 const UserData = localStorage.getItem('UserData')
                 const UserDataParsed = JSON.parse(UserData)
-                UserDataParsed.Targets[WalletAddress].Halted = !ActiveMapping[WalletAddress]
+                UserDataParsed.Targets[Wallet.id].Halted = !ActiveMapping[Wallet.id]
                 localStorage.setItem("UserData", JSON.stringify(UserDataParsed))
-                const URL = `https://bayharbour.boats/setValue?session_token=${Token}&account=${WalletAddress}&param=Halted&value=${!ActiveMapping[WalletAddress]}`
+                const URL = `https://bayharbour.boats/setValue?session_token=${Token}&account=${Wallet.id}&param=Halted&value=${!ActiveMapping[Wallet.id]}`
                 post(URL)
-                const Colour = DataBaseData.Valid ? (ActiveMapping[WalletAddress] ? "green" : "orange") : "red"
-                AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+                const Colour = DataBaseData.Valid ? (ActiveMapping[Wallet.id] ? "green" : "orange") : "red"
+                AddressName.innerHTML = `${shorthandString(Wallet.id, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
             }
         })
         Pen.addEventListener("click", () => {
@@ -234,7 +295,7 @@ window.addEventListener('load', () => {
                 }
             } else {
                 EditFrame.classList.toggle('hidden');
-                EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName, OriginalAccount: WalletAddress}
+                EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName, OriginalAccount: Wallet.id}
                 Wallet.style.boxShadow = '0 0 20px #FFBD59';
 
             }
@@ -243,14 +304,14 @@ window.addEventListener('load', () => {
             const UserData = localStorage.getItem('UserData')
             const UserDataParsed = JSON.parse(UserData)
             const CurrentTargets = UserDataParsed.Targets
-            const CurrentTarget = CurrentTargets[WalletAddress]
+            const CurrentTarget = CurrentTargets[Wallet.id]
 
             if (EditFrameVisible) {
-                EditFrameKids["Wallet"].Input.value = WalletAddress
+                EditFrameKids["Wallet"].Input.value = Wallet.id
                 for (const k in DataBaseData) {
                     const Alias = ParamIDToAlias[k]
-                    console.log(CurrentTarget[k])
                     if (Parameters[Alias]) {
+                        console.log("Alias: ", Alias)
                         EditFrameKids[Alias].Input.value = CurrentTarget[k]
                     }
 
@@ -261,7 +322,7 @@ window.addEventListener('load', () => {
 
 
         PauseStatus.src = DataBaseData.Halted ? UnpauseAssetIcon : PauseAssetIcon
-        ActiveMapping[WalletAddress] = !DataBaseData.Halted
+        ActiveMapping[Wallet.id] = !DataBaseData.Halted
     }
     const UserData = localStorage.getItem('UserData')
     const UserDataParsed = JSON.parse(UserData)

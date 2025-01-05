@@ -70,20 +70,20 @@ function ChangeWalletAddress(EditFrameVis, New, Data){
     }).then(
         data => {
             console.log("IsValid: ", data.IsValid)
+            let Colour = null
             if (data.IsValid){
                 const UserData = GetDictionaryItem("UserData")
                 UserData.Targets[New].Valid = true
                 SetDictionaryItem("UserData", UserData)
-                const Colour = "orange"
-                EditFrameVis.WalletLabel.innerHTML = `${shorthandString(New, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+                Colour = "orange"
             } else {
                 //! not valid
                 const UserData = GetDictionaryItem("UserData")
                 UserData.Targets[New].Valid = false
                 SetDictionaryItem("UserData", UserData)
-                const Colour = "red"
-                EditFrameVis.WalletLabel.innerHTML = `${shorthandString(New, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+                Colour = "red"
             }
+            EditFrameVis.WalletLabel.innerHTML = `${shorthandString(New, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
             UserData.Targets[New].Halted = true
             EditFrameVis.PauseIcon.src = UnpauseAssetIcon
         }
@@ -185,14 +185,15 @@ window.addEventListener('load', () => {
 
         const UserData = GetDictionaryItem("UserData")
         VariablesParsed.Halted = UserData.Targets[EditFrameVisible.Wallet.id].Halted
-        const Colour = "grey"
-        EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(NewWallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+
         EditFrameVisible.AliasLabel.textContent = VariablesParsed.Alias
         ActiveMapping[EditFrameVisible.Wallet.id] = false
         
         //EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName}
 
         if (EditFrameVisible.Wallet.id != NewWallet){
+            const Colour = "grey"
+            EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(NewWallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
             ChangeWalletAddress(EditFrameVisible, NewWallet, VariablesParsed)
         } else {
             SetWalletDetails(EditFrameVisible, VariablesParsed)
@@ -253,6 +254,7 @@ window.addEventListener('load', () => {
         AddressName.className = "Names";
 
         if (!Client) {
+
             const Colour = DataBaseData.Valid ? (!DataBaseData.Halted ? "green" : "orange") : "red"
             AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
         } else {
@@ -338,7 +340,6 @@ window.addEventListener('load', () => {
                 }
             }
         })
-
 
 
         PauseStatus.src = DataBaseData.Halted ? UnpauseAssetIcon : PauseAssetIcon

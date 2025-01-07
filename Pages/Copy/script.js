@@ -198,8 +198,6 @@ window.addEventListener('load', () => {
         } else {
             SetWalletDetails(EditFrameVisible, VariablesParsed)
         }
-
-        //TODO parse updates to local storage and server
         EditFrameVisible = false 
 
     })
@@ -368,6 +366,5 @@ window.addEventListener('load', () => {
         post(URL, BaseWalletTemplate)
 
     })
-    //AddWalletDiv("ivsdbi981639879egfuwbefbwe018r", null, "Next Person")
 
 });

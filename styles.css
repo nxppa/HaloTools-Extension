@@ -1,12 +1,11 @@
-/* General Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     user-select: none;
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none;    /* Firefox */
-    -ms-user-select: none;     /* IE/Edge */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
     -webkit-user-drag: none;
     -khtml-user-drag: none;
     -moz-user-drag: none;
@@ -15,42 +14,34 @@
 
 body {
     font-family: 'Montserrat', sans-serif;
-    background-color: #1b1b1b; /* Dark background */
+    background-color: #1b1b1b;
     color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 600px; /* Fixed height */
-    width: 360px; /* Fixed width */
-    overflow: hidden; /* Prevent scrolling */
-    /*
-    background-image: url('Assets/Rings.png');
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    background-position: center;
-    */
-    transition: opacity 0.5s ease; /* Smooth fade effect */
-    opacity: 1; /* Fully visible by default */
-    animation: fadeOut 1s ease forwards; /* Fade out before redirect */
+    height: 600px;
+    width: 360px;
+    overflow: hidden;
+    transition: opacity 0.5s ease;
+    opacity: 1;
+    animation: fadeOut 1s ease forwards;
 }
 .hidden {
-    opacity: 0; /* Fade out */
+    opacity: 0;
 }
 
 
-/* Container */
 .container {
     width: 100%;
     height: 100%;
-    background-color: #242424e6; /* Slightly lighter background */
+    background-color: #242424e6;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Distribute elements */
+    justify-content: space-between; 
     padding: 20px;
 }
 
-/* Header */
 .header {
     display: flex;
     justify-content: space-between;
@@ -73,7 +64,6 @@ body {
     cursor: pointer;
 }
 
-/* Main Content */
 .content {
     display: flex;
     flex-direction: column;
@@ -86,7 +76,7 @@ body {
 .icon {
     width: 150px;
     margin-bottom: 50px;
-    pointer-events: none; /* Disable all mouse events */
+    pointer-events: none;
 
 }
 
@@ -104,15 +94,15 @@ h1 {
     border-radius: 5px;
     background-color: #1b1b1b;
     color: white;
-    box-shadow: 0 0 15px 0px #4b4b4b; /* Initial glow */
-    transition: box-shadow 0.5s ease; /* Smooth transition */
-    outline: none; /* Removes the blue outline on focus */
+    box-shadow: 0 0 15px 0px #4b4b4b;
+    transition: box-shadow 0.5s ease;
+    outline: none;
     font-family: 'Montserrat', sans-serif;
 
 }
 .input-box::selection{
-        background-color: #FFBD59; /* Highlight background color */
-        color: #000000; /* Highlighted text color */
+        background-color: #FFBD59;
+        color: #000000;
 }
 
 .footer {
@@ -130,12 +120,12 @@ h1 {
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 0 30px 0px #ffd000; /* Initial glow */
+    box-shadow: 0 0 30px 0px #ffd000;
     font-family: 'Montserrat', sans-serif;
 
 }
 
 .unlock-button:hover {
-    box-shadow: 0 0 30px 0px #ff9900; /* Initial glow */
-    background-color: #ff9900; /* Darker purple on hover */
+    box-shadow: 0 0 30px 0px #ff9900;
+    background-color: #ff9900;
 }

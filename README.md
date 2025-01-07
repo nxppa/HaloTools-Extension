@@ -1,1 +1,1 @@
-# Google extension used for accessing the bot
+# Google extension used for accessing HaloTools API

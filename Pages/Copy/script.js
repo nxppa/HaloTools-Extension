@@ -12,7 +12,7 @@ const BaseWalletTemplate = {
     "MaxMarketCap": 0.04,
     "Halted": true,
     "Alias": "Alias",
-    "Valid": false //TODO make server validate whether or not the wallet account is actually an account
+    "Valid": false
 }
 const Parameters = {
     "Wallet": "Str",
@@ -182,15 +182,10 @@ window.addEventListener('load', () => {
 
         const NewWallet = EditFrameKids["Wallet"].Input.value
         //TODO make checks to see if wallet inputs are valid
-
         const UserData = GetDictionaryItem("UserData")
         VariablesParsed.Halted = UserData.Targets[EditFrameVisible.Wallet.id].Halted
-
         EditFrameVisible.AliasLabel.textContent = VariablesParsed.Alias
         ActiveMapping[EditFrameVisible.Wallet.id] = false
-        
-        //EditFrameVisible = {Wallet: Wallet, WalletLabel: AddressName, AliasLabel: AliasName}
-
         if (EditFrameVisible.Wallet.id != NewWallet){
             const Colour = "grey"
             EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(NewWallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
@@ -290,7 +285,6 @@ window.addEventListener('load', () => {
             if (WalletData.Valid) {
                 ActiveMapping[Wallet.id] = !ActiveMapping[Wallet.id]
                 PauseStatus.src = ActiveMapping[Wallet.id] ? PauseAssetIcon : UnpauseAssetIcon
-                //TODO make it send req to database to post new information and get if valid
                 const Token = localStorage.getItem('session_token')
                 const UserData = GetDictionaryItem("UserData")
                 UserData.Targets[Wallet.id].Halted = !ActiveMapping[Wallet.id]

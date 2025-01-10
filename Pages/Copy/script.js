@@ -53,6 +53,38 @@ function GetDictionaryItem(Item){
     const DataParsed = JSON.parse(UserData)
     return DataParsed
 }
+function convertEpochToDate(epochTime, isMonthFirst = true) {
+    console.log("epoch time: ", epochTime)
+    const date = new Date(epochTime * 1000);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const formattedDay = day.toString().padStart(2, '0');
+    const formattedMonth = month.toString().padStart(2, '0');
+    if (isMonthFirst) {
+        return `${formattedMonth}/${formattedDay}`; // MM/DD
+    } else {
+        return `${formattedDay}/${formattedMonth}`; // DD/MM
+    }
+}
+function convertEpochToLocalTimeWithPeriod(epochTime) {
+    const date = new Date(epochTime * 1000); // Convert epoch to milliseconds
+    const hours = date.getHours(); // Get hours (0-23)
+    const minutes = date.getMinutes(); // Get minutes (0-59)
+    const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+    const formattedMinutes = minutes.toString().padStart(2, '0'); // Ensure 2 digits
+    const period = hours >= 12 ? 'PM' : 'AM';
+    return {
+        time: `${formattedHours}:${formattedMinutes}`, // e.g., "3:41"
+        period: period, // e.g., "pm"
+    };
+}
+
+
+function is24HoursSince(epochTime) {
+    const currentTime = Date.now(); // Current time in milliseconds
+    const elapsedTime = currentTime - epochTime * 1000; // Time difference in milliseconds
+    return elapsedTime >= 24 * 60 * 60 * 1000; // Check if >= 24 hours
+}
 
 function ChangeWalletAddress(EditFrameVis, New, Data){
     const Original = EditFrameVis.Wallet.id
@@ -210,42 +242,80 @@ window.addEventListener('load', () => {
         const children = ScrollBox.children;
         const secondToLast = children[children.length - 1];
 
+        
         Wallet.className = 'WalletHolder';
         Wallet.id = WalletAddress;
         ScrollBox.insertBefore(Wallet, secondToLast)
-
+        
         const IconsHolder = document.createElement('div');
         IconsHolder.className = "IconsHolder"
         Wallet.appendChild(IconsHolder)
-
+        
         const Pen = document.createElement('input');
         Pen.type = "image"
         Pen.src = PenAsset
         Pen.className = "WalletIcon"
         IconsHolder.appendChild(Pen)
-
-
-
+        
+        
         const Trash = document.createElement('input');
         Trash.type = "image"
         Trash.src = TrashAsset
         Trash.className = "WalletIcon"
         IconsHolder.appendChild(Trash)
-
+        
         const PauseStatus = document.createElement('input');
         PauseStatus.type = "image"
         PauseStatus.className = "WalletIcon"
         IconsHolder.appendChild(PauseStatus)
+        
+        const TransactionInfo = document.createElement('div')
+        TransactionInfo.className = "TransactionInfo"
+        Wallet.appendChild(TransactionInfo)
+        
 
+        const TimeStamp = document.createElement("span")
+        //TimeStamp.className = "TransactionIcon"
+        TimeStamp.id = "TimeStamp"
+        const epochTime = Math.floor(1736539079 - Math.random()*100000) //TODO make this check the target wallet's "Most recent transaction" element
+        let TimeStr = null
+        if (is24HoursSince(epochTime)){
+            const TimeParsed = convertEpochToDate(epochTime, false)
+            TimeStr = `${TimeParsed}`
 
-
+        } else {
+            const TimeParsed = convertEpochToLocalTimeWithPeriod(epochTime) //TODO make it say month/day depending on locale
+            TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
+            
+        }
+        TimeStamp.innerHTML =  `<span>${TimeStr}</span>`
+        TimeStamp.style.color = "rgba(150, 150, 150)"
+        TransactionInfo.appendChild(TimeStamp)
+        const LastTradeType = document.createElement("span")
+  
+        //LastTradeType.className = "TransactionIcon"
+        LastTradeType.id = "LTT"
+        
+        const LTT =  Math.random() > 0.5 ? "BOUGHT" : "SOLD"
+        const LastTransClr = LTT == "BOUGHT" ? "green" : "red"
+        const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
+        LastTradeType.innerHTML =  `<span style="color:${LastTransClr}">${LTT}</span>`
+        LastTradeType.style.backgroundColor = CLR;
+        LastTradeType.style.borderRadius = '4px'; // Rounded corners with 8px radius
+        LastTradeType.style.border = `2px solid ${CLR}`; // Solid blue outline with 2px thickness
+        LastTradeType.style.padding = '4px 8px'; // Optional: Add some padding for better appearance
+        console.log(GetDictionaryItem("UserData"), Wallet.id)
+        if (!GetDictionaryItem("UserData").Targets[Wallet.id] || GetDictionaryItem("UserData").Targets[Wallet.id].Valid != true){ 
+            TransactionInfo.classList.toggle('hidden');
+        }
+        TransactionInfo.appendChild(LastTradeType)
+        
         const WalletInfoHolder = document.createElement('div');
         WalletInfoHolder.className = "WalletInfoHolder"
         Wallet.appendChild(WalletInfoHolder)
 
         const AddressName = document.createElement("span");
         AddressName.className = "Names";
-
         if (!Client) {
 
             const Colour = DataBaseData.Valid ? (!DataBaseData.Halted ? "green" : "orange") : "red"

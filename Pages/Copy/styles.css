@@ -156,7 +156,7 @@ h1 {
 }
 
 .hidden {
-    display: none;
+    display: none !important; /* Use !important to override any inline or conflicting styles */
 }
 
 .EditFrame {
@@ -281,21 +281,53 @@ ParameterInput input:focus{
 .IconsHolder {
     position: absolute;
     top: 5px;
-    /* Adjust as needed for spacing */
     right: 50px;
-    /* Adjust as needed for spacing */
     width: 20px;
-    /* Example size */
     height: 20px;
-    /* Example size */
 }
 
 .WalletIcon {
     width: 17px;
-    /* Example size */
     height: 17px;
-    /* Example size */
     margin-right: 5px;
+}
+.TransactionInfo {
+    position: absolute;
+    bottom: 11px;
+    right: 4px; /* Anchor to the right edge */
+    display: flex; /* Use Flexbox for layout */
+    flex-direction: row; /* Maintain logical order */
+    justify-content: flex-end; /* Align content to the right */
+    align-items: center; /* Center items vertically */
+    gap: 5px; /* Consistent spacing between items */
+    font-size: 14px; /* Consistent font size */
+    text-align: right; /* Align text content to the right */
+}
+
+.TransactionIcon {
+    width: 17px;
+    height: 17px;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    flex-shrink: 0; /* Prevent shrinking of the label */
+    margin-left: 5px; /* Adjust spacing between elements */
+}
+
+
+#TimeStamp{
+    font-size: 14px;
+    flex-shrink: 0; /* Prevent shrinking of the time */
+    font-family: "Courier New", monospace;
+}
+#LTT{
+    width: 40px;
+    height: 20px;
+    display: inline-flex; /* Ensure consistent alignment */
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    color:#f4f4f4;
+    font-family: "Courier New", monospace;
 }
 
 /* Target the entire scrollbar */

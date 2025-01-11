@@ -55,7 +55,6 @@ window.addEventListener('load', () => {
         
         
         let BaseString = `<span style="color:${Colours.Type}; ${SelectablePreset}">Type: </span><span style="color:${Colours.TypeAssigned}; ${SelectablePreset}">${Type}\n</span>`;
-        //TODO make so last line doesnt create new line
         switch (Type) {
             case "Wallet":
                 BaseString += `<span style="color:${Colours.Account}; ${SelectablePreset}">Account: </span><span style="color:${Colours.Program}; ${SelectablePreset}">${data.account} \n</span>`;
@@ -149,5 +148,3 @@ window.addEventListener('load', () => {
         QueryAccountDetails()
     })
 });
-
-//TODO add functionality to download

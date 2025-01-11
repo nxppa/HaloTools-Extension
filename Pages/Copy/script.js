@@ -1,7 +1,9 @@
 const PenAsset = "../../Assets/WalletCopying/Pen.png"
+const DetailsAsset = "../../Assets/WalletCopying/Details.png"
 const TrashAsset = "../../Assets/WalletCopying/Trash.png"
 const PauseAssetIcon = "../../Assets/WalletCopying/Pause.png"
 const UnpauseAssetIcon = "../../Assets/WalletCopying/Unpause.png"
+
 //EYWsnfIKgPo2E
 let ActiveMapping = {}
 let EditFrameKids = {}
@@ -61,29 +63,29 @@ function convertEpochToDate(epochTime, isMonthFirst = true) {
     const formattedDay = day.toString().padStart(2, '0');
     const formattedMonth = month.toString().padStart(2, '0');
     if (isMonthFirst) {
-        return `${formattedMonth}/${formattedDay}`; // MM/DD
+        return `${formattedMonth}/${formattedDay}`
     } else {
-        return `${formattedDay}/${formattedMonth}`; // DD/MM
+        return `${formattedDay}/${formattedMonth}`
     }
 }
 function convertEpochToLocalTimeWithPeriod(epochTime) {
-    const date = new Date(epochTime * 1000); // Convert epoch to milliseconds
-    const hours = date.getHours(); // Get hours (0-23)
-    const minutes = date.getMinutes(); // Get minutes (0-59)
-    const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-    const formattedMinutes = minutes.toString().padStart(2, '0'); // Ensure 2 digits
+    const date = new Date(epochTime * 1000)
+    const hours = date.getHours()
+    const minutes = date.getMinutes()
+    const formattedHours = hours % 12 || 12
+    const formattedMinutes = minutes.toString().padStart(2, '0')
     const period = hours >= 12 ? 'PM' : 'AM';
     return {
-        time: `${formattedHours}:${formattedMinutes}`, // e.g., "3:41"
-        period: period, // e.g., "pm"
+        time: `${formattedHours}:${formattedMinutes}`,
+        period: period,
     };
 }
 
 
 function is24HoursSince(epochTime) {
-    const currentTime = Date.now(); // Current time in milliseconds
-    const elapsedTime = currentTime - epochTime * 1000; // Time difference in milliseconds
-    return elapsedTime >= 24 * 60 * 60 * 1000; // Check if >= 24 hours
+    const currentTime = Date.now()
+    const elapsedTime = currentTime - epochTime * 1000
+    return elapsedTime >= 24 * 60 * 60 * 1000
 }
 
 function ChangeWalletAddress(EditFrameVis, New, Data){
@@ -251,6 +253,15 @@ window.addEventListener('load', () => {
         IconsHolder.className = "IconsHolder"
         Wallet.appendChild(IconsHolder)
         
+        
+
+        const Details = document.createElement('input');
+        Details.type = "image"
+        Details.src = DetailsAsset
+        Details.className = "WalletIcon"
+        IconsHolder.appendChild(Details)
+        
+
         const Pen = document.createElement('input');
         Pen.type = "image"
         Pen.src = PenAsset
@@ -275,25 +286,24 @@ window.addEventListener('load', () => {
         
 
         const TimeStamp = document.createElement("span")
-        //TimeStamp.className = "TransactionIcon"
         TimeStamp.id = "TimeStamp"
-        const epochTime = Math.floor(1736539079 - Math.random()*100000) //TODO make this check the target wallet's "Most recent transaction" element
+        //TODO Make this a function to update most recent transaction
+        //TODO make this check the target wallet's "Most recent transaction" element
+        const epochTime = Math.floor(1736539079 - Math.random()*100000) 
         let TimeStr = null
         if (is24HoursSince(epochTime)){
             const TimeParsed = convertEpochToDate(epochTime, false)
             TimeStr = `${TimeParsed}`
 
         } else {
-            const TimeParsed = convertEpochToLocalTimeWithPeriod(epochTime) //TODO make it say month/day depending on locale
+            const TimeParsed = convertEpochToLocalTimeWithPeriod(epochTime) 
             TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
-            
+            //TODO make it say month/day depending on locale
         }
         TimeStamp.innerHTML =  `<span>${TimeStr}</span>`
         TimeStamp.style.color = "rgba(150, 150, 150)"
         TransactionInfo.appendChild(TimeStamp)
         const LastTradeType = document.createElement("span")
-  
-        //LastTradeType.className = "TransactionIcon"
         LastTradeType.id = "LTT"
         
         const LTT =  Math.random() > 0.5 ? "BOUGHT" : "SOLD"
@@ -301,9 +311,9 @@ window.addEventListener('load', () => {
         const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
         LastTradeType.innerHTML =  `<span style="color:${LastTransClr}">${LTT}</span>`
         LastTradeType.style.backgroundColor = CLR;
-        LastTradeType.style.borderRadius = '4px'; // Rounded corners with 8px radius
-        LastTradeType.style.border = `2px solid ${CLR}`; // Solid blue outline with 2px thickness
-        LastTradeType.style.padding = '4px 8px'; // Optional: Add some padding for better appearance
+        LastTradeType.style.borderRadius = '4px'
+        LastTradeType.style.border = `2px solid ${CLR}`;
+        LastTradeType.style.padding = '4px 8px'; 
         console.log(GetDictionaryItem("UserData"), Wallet.id)
         if (!GetDictionaryItem("UserData").Targets[Wallet.id] || GetDictionaryItem("UserData").Targets[Wallet.id].Valid != true){ 
             TransactionInfo.classList.toggle('hidden');
@@ -428,7 +438,7 @@ window.addEventListener('load', () => {
         const Token = localStorage.getItem('session_token')
         const URL = `https://bayharbour.boats/newWallet?session_token=${Token}&account=${NewName}`
         post(URL, BaseWalletTemplate)
-
+        
     })
 
 });

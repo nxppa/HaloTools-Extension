@@ -505,15 +505,16 @@ window.addEventListener('load', () => {
     const ws = new WebSocket(`wss://bayharbour.boats/ws?session_token=${Token}`)
     ws.onopen = () => {
         console.log('WebSocket connected');
-        // Optionally, send an initial message to the server
-        ws.send(JSON.stringify({ message: 'Hello from content script!' }));
+        ws.send(JSON.stringify({ message: 'initial ping' }));
+        HeartBeat = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ action: 'ping' }));
+            }
+        }, 30000)
     };
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         console.log('Message from server:', data);
-        const messageElement = document.createElement('div');
-        messageElement.textContent = `Server message: ${data.message}`;
-        document.body.appendChild(messageElement);
     };
     ws.onclose = (event) => {
         console.log(`WebSocket closed: ${event.code} - ${event.reason}`);

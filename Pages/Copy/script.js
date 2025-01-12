@@ -14,7 +14,8 @@ const BaseWalletTemplate = {
     "MaxMarketCap": 0.04,
     "Halted": true,
     "Alias": "Alias",
-    "Valid": false
+    "Valid": false,
+    "RecentTransactions":[]
 }
 const Parameters = {
     "Wallet": "Str",
@@ -291,7 +292,7 @@ window.addEventListener('load', () => {
         TimeStamp.id = "TimeStamp"
         //TODO Make this a function to update most recent transaction
         //TODO make this check the target wallet's "Most recent transaction" element
-        const epochTime = Math.floor(Date.now() - Math.random() * 100000)
+        const epochTime = Math.floor(Date.now() - Math.random() * 1000000)
         let TimeStr = null
         if (is24HoursSince(epochTime)) {
             const TimeParsed = convertEpochToDate(epochTime, false)

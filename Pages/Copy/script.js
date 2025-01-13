@@ -227,6 +227,7 @@ window.addEventListener('load', () => {
         //TODO make checks to see if wallet inputs are valid
         const UserData = GetDictionaryItem("UserData")
         VariablesParsed.Halted = UserData.Targets[EditFrameVisible.Wallet.id].Halted
+        VariablesParsed.RecentTransactions = UserData.Targets[EditFrameVisible.Wallet.id].RecentTransactions
         EditFrameVisible.AliasLabel.textContent = VariablesParsed.Alias
         ActiveMapping[EditFrameVisible.Wallet.id] = false
         if (EditFrameVisible.Wallet.id != NewWallet) {
@@ -299,7 +300,7 @@ window.addEventListener('load', () => {
         //TODO Make this a function to update most recent transaction
         //TODO make this check the target wallet's "Most recent transaction" element
         let EpochTime = 0 
-        console.log("dbd: ", DataBaseData)
+        console.log(WalletAddress, DataBaseData)
         let MostRecentTransaction = DataBaseData.RecentTransactions[DataBaseData.RecentTransactions.length] 
         if (MostRecentTransaction){
            EpochTime = MostRecentTransaction.Time
@@ -337,9 +338,7 @@ window.addEventListener('load', () => {
         LastTradeType.style.border = `2px solid ${CLR}`;
         LastTradeType.style.padding = '4px 8px';
         WalletToRecentTransactionElements[WalletAddress] = {TransactionInfo: TransactionInfo, LastTradeType: LastTradeType, TimeStamp: TimeStamp}
-        if (!GetDictionaryItem("UserData").Targets[Wallet.id] || GetDictionaryItem("UserData").Targets[Wallet.id].Valid != true) {
-            TransactionInfo.classList.toggle('hidden');
-        }
+
         TransactionInfo.appendChild(LastTradeType)
 
         const WalletInfoHolder = document.createElement('div');

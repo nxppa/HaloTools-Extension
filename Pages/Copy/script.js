@@ -1,4 +1,5 @@
 
+
 const PenAsset = "../../Assets/WalletCopying/Pen.png"
 const DetailsAsset = "../../Assets/WalletCopying/Details.png"
 const TrashAsset = "../../Assets/WalletCopying/Trash.png"
@@ -292,17 +293,28 @@ window.addEventListener('load', () => {
         TimeStamp.id = "TimeStamp"
         //TODO Make this a function to update most recent transaction
         //TODO make this check the target wallet's "Most recent transaction" element
-        const epochTime = Math.floor(Date.now() - Math.random() * 1000000)
+        let EpochTime = 0 
+        console.log("dbd: ", DataBaseData)
+        let MostRecentTransaction = DataBaseData.RecentTransactions[DataBaseData.RecentTransactions.length] 
+        if (MostRecentTransaction){
+           EpochTime = MostRecentTransaction.Time
+        }
+        
         let TimeStr = null
-        if (is24HoursSince(epochTime)) {
-            const TimeParsed = convertEpochToDate(epochTime, false)
+        if (is24HoursSince(EpochTime)) {
+            const TimeParsed = convertEpochToDate(EpochTime, false)
             TimeStr = `${TimeParsed}`
 
         } else {
-            const TimeParsed = convertEpochToLocalTimeWithPeriod(epochTime)
+            const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
             TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
             //TODO make it say month/day depending on locale
         }
+        if (!EpochTime){
+            TransactionInfo.classList.toggle('hidden');
+
+        }
+
         TimeStamp.innerHTML = `<span>${TimeStr}</span>`
         TimeStamp.style.color = "rgba(150, 150, 150)"
         TransactionInfo.appendChild(TimeStamp)
@@ -510,10 +522,14 @@ window.addEventListener('load', () => {
             if (ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ action: 'ping' }));
             }
-        }, 30000)
+        }, 10000)
     };
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
+        const type = data.type
+        if (type == "Transaction"){
+            
+        }
         console.log('Message from server:', data);
     };
     ws.onclose = (event) => {

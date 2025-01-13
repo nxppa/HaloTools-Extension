@@ -9,6 +9,9 @@ const UnpauseAssetIcon = "../../Assets/WalletCopying/Unpause.png"
 //EYWsnfIKgPo2E
 let ActiveMapping = {}
 let EditFrameKids = {}
+
+let WalletToRecentTransactionElements = {}
+
 const BaseWalletTemplate = {
     "PriorityFee": 0.0001,
     "MaxProportionSpending": 0.05,
@@ -98,6 +101,8 @@ function ChangeWalletAddress(EditFrameVis, New, Data) {
     UserData.Targets[New] = UserData.Targets[Original]
     delete UserData.Targets[Original]
     console.log("data: ", UserData)
+    WalletToRecentTransactionElements[New] =  WalletToRecentTransactionElements[Original]
+    delete WalletToRecentTransactionElements[Original] 
     SetDictionaryItem("UserData", UserData)
     const Token = localStorage.getItem('session_token')
     const URL = `https://bayharbour.boats/setWalletAddress?session_token=${Token}&old=${Original}&new=${New}`
@@ -318,9 +323,11 @@ window.addEventListener('load', () => {
         TimeStamp.innerHTML = `<span>${TimeStr}</span>`
         TimeStamp.style.color = "rgba(150, 150, 150)"
         TransactionInfo.appendChild(TimeStamp)
+
+        
         const LastTradeType = document.createElement("span")
         LastTradeType.id = "LTT"
-
+        
         const LTT = Math.random() > 0.5 ? "BOUGHT" : "SOLD"
         const LastTransClr = LTT == "BOUGHT" ? "green" : "red"
         const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
@@ -329,6 +336,7 @@ window.addEventListener('load', () => {
         LastTradeType.style.borderRadius = '4px'
         LastTradeType.style.border = `2px solid ${CLR}`;
         LastTradeType.style.padding = '4px 8px';
+        WalletToRecentTransactionElements[WalletAddress] = {TransactionInfo: TransactionInfo, LastTradeType: LastTradeType, TimeStamp: TimeStamp}
         if (!GetDictionaryItem("UserData").Targets[Wallet.id] || GetDictionaryItem("UserData").Targets[Wallet.id].Valid != true) {
             TransactionInfo.classList.toggle('hidden');
         }
@@ -528,7 +536,9 @@ window.addEventListener('load', () => {
         const data = JSON.parse(event.data);
         const type = data.type
         if (type == "Transaction"){
-            
+            const Divs = WalletToRecentTransactionElements[data.data.Wallet]
+            Divs.TransactionInfo.classList.toggle('hidden')
+            //TODO make it so that it updates text and trans type
         }
         console.log('Message from server:', data);
     };

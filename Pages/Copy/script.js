@@ -1,3 +1,21 @@
+function StartFetchingValidator() {
+    const AuthTimeMins = 8
+    setInterval(async () => {
+        const Token = localStorage.getItem('session_token')
+        if (Token) {
+            const req = `https://bayharbour.boats/validate?session_token=${Token}`
+            const Response = await fetch(req)
+            const result = await Response.json();
+            if (result.success) {
+                localStorage.setItem('session_token', result.token);
+                document.cookie = `session_token=${result.token}; HttpOnly; Secure; Max-Age=${AuthTimeMins * 60};`
+            }
+        }
+
+    }, 10000)
+}
+StartFetchingValidator();
+
 
 
 const PenAsset = "../../Assets/WalletCopying/Pen.png"
@@ -20,7 +38,7 @@ const BaseWalletTemplate = {
     "Halted": true,
     "Alias": "Alias",
     "Valid": false,
-    "RecentTransactions":[]
+    "RecentTransactions": []
 }
 const Parameters = {
     "Wallet": "Str",
@@ -101,8 +119,8 @@ function ChangeWalletAddress(EditFrameVis, New, Data) {
     UserData.Targets[New] = UserData.Targets[Original]
     delete UserData.Targets[Original]
     console.log("data: ", UserData)
-    WalletToRecentTransactionElements[New] =  WalletToRecentTransactionElements[Original]
-    delete WalletToRecentTransactionElements[Original] 
+    WalletToRecentTransactionElements[New] = WalletToRecentTransactionElements[Original]
+    delete WalletToRecentTransactionElements[Original]
     SetDictionaryItem("UserData", UserData)
     const Token = localStorage.getItem('session_token')
     const URL = `https://bayharbour.boats/setWalletAddress?session_token=${Token}&old=${Original}&new=${New}`
@@ -246,7 +264,7 @@ window.addEventListener('load', () => {
     EditFrame.classList.toggle('hidden');
     PreviousTransactionsFrame.classList.toggle('hidden');
     let EditFrameVisible = false
-    let PreviousTransactionsFrameVisible  = false
+    let PreviousTransactionsFrameVisible = false
     const ScrollBox = document.getElementById("scroll-box")
     let WalletDivDex = 0
     function AddWalletDiv(WalletAddress, DataBaseData, Client) {
@@ -299,13 +317,13 @@ window.addEventListener('load', () => {
         TimeStamp.id = "TimeStamp"
         //TODO Make this a function to update most recent transaction
         //TODO make this check the target wallet's "Most recent transaction" element
-        let EpochTime = 0 
+        let EpochTime = 0
         console.log(WalletAddress, DataBaseData)
-        let MostRecentTransaction = DataBaseData.RecentTransactions[DataBaseData.RecentTransactions.length] 
-        if (MostRecentTransaction){
-           EpochTime = MostRecentTransaction.Time
+        let MostRecentTransaction = DataBaseData.RecentTransactions[DataBaseData.RecentTransactions.length]
+        if (MostRecentTransaction) {
+            EpochTime = MostRecentTransaction.Time
         }
-        
+
         let TimeStr = null
         if (is24HoursSince(EpochTime)) {
             const TimeParsed = convertEpochToDate(EpochTime, false)
@@ -316,7 +334,7 @@ window.addEventListener('load', () => {
             TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
             //TODO make it say month/day depending on locale
         }
-        if (!EpochTime){
+        if (!EpochTime) {
             TransactionInfo.classList.toggle('hidden');
 
         }
@@ -325,10 +343,10 @@ window.addEventListener('load', () => {
         TimeStamp.style.color = "rgba(150, 150, 150)"
         TransactionInfo.appendChild(TimeStamp)
 
-        
+
         const LastTradeType = document.createElement("span")
         LastTradeType.id = "LTT"
-        
+
         const LTT = Math.random() > 0.5 ? "BOUGHT" : "SOLD"
         const LastTransClr = LTT == "BOUGHT" ? "green" : "red"
         const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
@@ -337,7 +355,7 @@ window.addEventListener('load', () => {
         LastTradeType.style.borderRadius = '4px'
         LastTradeType.style.border = `2px solid ${CLR}`;
         LastTradeType.style.padding = '4px 8px';
-        WalletToRecentTransactionElements[WalletAddress] = {TransactionInfo: TransactionInfo, LastTradeType: LastTradeType, TimeStamp: TimeStamp}
+        WalletToRecentTransactionElements[WalletAddress] = { TransactionInfo: TransactionInfo, LastTradeType: LastTradeType, TimeStamp: TimeStamp }
 
         TransactionInfo.appendChild(LastTradeType)
 
@@ -534,7 +552,7 @@ window.addEventListener('load', () => {
     ws.onmessage = (event) => {
         const data = JSON.parse(event.data);
         const type = data.type
-        if (type == "Transaction"){
+        if (type == "Transaction") {
             const Divs = WalletToRecentTransactionElements[data.data.Wallet]
             Divs.TransactionInfo.classList.toggle('hidden')
             //TODO make it so that it updates text and trans type

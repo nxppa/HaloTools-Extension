@@ -1,4 +1,3 @@
-//9WD3qzitzuC1r
 //EYWsnfIKgPo2E
 //TODO make it so that session key is renewed every few seconds while extension open 
 
@@ -19,14 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('session_token');
         document.cookie = 'session_token=; Max-Age=0; path=/';
     }
-    async function UpdateUserData(Token){
-        const req = `https://bayharbour.boats/getData?session_token=${Token}` 
-        const Response = await fetch(req)
-        const JSONRes = await Response.json()
-        
-        const Stringified = JSON.stringify(JSONRes)
+    async function UpdateUserData(UserData){
+        const Stringified = JSON.stringify(UserData)
         //alert(Stringified)
-
+        console.log("UserData: ", Stringified)
         if (Response){
             localStorage.setItem('UserData', Stringified);
         } 
@@ -44,8 +39,8 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('session_token', Token);
         document.cookie = `session_token=${Token}; HttpOnly; Secure; Max-Age=${AuthTimeMins * 60};`
     }
-    async function OpenMainPage(Token) {
-        UpdateUserData(Token)
+    async function OpenMainPage(result) {
+        UpdateUserData(result.UserData)
         document.body.classList.add('hidden')
         InputBox.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.8)';
         setTimeout(() => {
@@ -70,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 SetToken(result.token)
                 console.log(result)
-                OpenMainPage(result.token)
+                OpenMainPage(result)
             } else {
             }
         } else {
@@ -96,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 SetToken(result.token)
                 console.log(result.token)
                 console.log('Authentication successful:', result);
-                OpenMainPage(result.token)
+                OpenMainPage(result)
                 return
             }
         }

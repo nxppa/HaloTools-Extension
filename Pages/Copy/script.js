@@ -71,6 +71,13 @@ async function post(URL, body) {
         body: JSON.stringify(body),
     });
 }
+function SetVisible(Element, Yes = true) {
+    if (Yes) {
+        Element.classList.remove('hidden'); // Remove the class
+    } else {
+        Element.classList.add('hidden'); // Add the class
+    }
+}
 function SetDictionaryItem(Item, Dictionary) {
     localStorage.setItem(Item, JSON.stringify(Dictionary))
 }
@@ -80,7 +87,6 @@ function GetDictionaryItem(Item) {
     return DataParsed
 }
 function convertEpochToDate(epochTime, isMonthFirst = true) {
-    console.log("epoch time: ", epochTime)
     const date = new Date(epochTime * 1000);
     const day = date.getDate();
     const month = date.getMonth() + 1;
@@ -93,17 +99,19 @@ function convertEpochToDate(epochTime, isMonthFirst = true) {
     }
 }
 function convertEpochToLocalTimeWithPeriod(epochTime) {
-    const date = new Date(epochTime * 1000)
-    const hours = date.getHours()
-    const minutes = date.getMinutes()
-    const formattedHours = hours % 12 || 12
-    const formattedMinutes = minutes.toString().padStart(2, '0')
+    epochTime = Math.floor(epochTime / 1000);
+    const date = new Date(epochTime * 1000);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM/PM
+    const formattedMinutes = minutes.toString().padStart(2, '0'); // Pad single-digit minutes
     const period = hours >= 12 ? 'PM' : 'AM';
     return {
         time: `${formattedHours}:${formattedMinutes}`,
         period: period,
     };
 }
+
 
 
 function is24HoursSince(epochTime) {
@@ -237,7 +245,7 @@ window.addEventListener('load', () => {
             console.log("parsed: ", k)
             const Actual = ParamAliasToID[k]
             if (Actual) {
-                VariablesParsed[Actual] = Frame.Input.value
+                VariablesParsed[Actual] = convertValue(Actual, Frame.Input.value)
             }
         }
 
@@ -318,10 +326,11 @@ window.addEventListener('load', () => {
         //TODO Make this a function to update most recent transaction
         //TODO make this check the target wallet's "Most recent transaction" element
         let EpochTime = 0
-        console.log(WalletAddress, DataBaseData)
-        let MostRecentTransaction = DataBaseData.RecentTransactions[DataBaseData.RecentTransactions.length]
+        let MostRecentTransaction = DataBaseData.RecentTransactions[DataBaseData.RecentTransactions.length - 1]
         if (MostRecentTransaction) {
             EpochTime = MostRecentTransaction.Time
+            console.log("found most recent trans for ", WalletAddress, DataBaseData)
+        } else {
         }
 
         let TimeStr = null
@@ -347,13 +356,17 @@ window.addEventListener('load', () => {
         const LastTradeType = document.createElement("span")
         LastTradeType.id = "LTT"
 
-        const LTT = Math.random() > 0.5 ? "BOUGHT" : "SOLD"
+        let LTT = Math.random() > 0.5 ? "BOUGHT" : "SOLD"
+        if (MostRecentTransaction) {
+            LTT = MostRecentTransaction.transactionType == "sell" ? "SOLD" : "BOUGHT"
+        }
+
         const LastTransClr = LTT == "BOUGHT" ? "green" : "red"
         const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
         LastTradeType.innerHTML = `<span style="color:${LastTransClr}">${LTT}</span>`
         LastTradeType.style.backgroundColor = CLR;
-        LastTradeType.style.borderRadius = '4px'
         LastTradeType.style.border = `2px solid ${CLR}`;
+        LastTradeType.style.borderRadius = '4px'
         LastTradeType.style.padding = '4px 8px';
         WalletToRecentTransactionElements[WalletAddress] = { TransactionInfo: TransactionInfo, LastTradeType: LastTradeType, TimeStamp: TimeStamp }
 
@@ -475,6 +488,8 @@ window.addEventListener('load', () => {
         // Details button logic
         Details.addEventListener("click", () => {
             // Hide EditFrame if visible
+
+
             if (EditFrameVisible) {
                 EditFrame.classList.add('hidden');
                 EditFrameVisible = false;
@@ -510,12 +525,22 @@ window.addEventListener('load', () => {
             PreviousWalletDiv = Wallet;
             LastIndexedAt = CurrentWalletDiv;
 
+            if (PreviousTransactionsFrameVisible){
+
+                const UserData = GetDictionaryItem("UserData")
+                const TargetWallet = PreviousTransactionsFrameVisible.OriginalAccount
+                const RecentTransactions = UserData.Targets[TargetWallet].RecentTransactions
+                
+                for (const TransInfo of RecentTransactions){
+                    console.log(TransInfo)
+                }
+            }
         });
 
         PauseStatus.src = DataBaseData.Halted ? UnpauseAssetIcon : PauseAssetIcon
         ActiveMapping[Wallet.id] = !DataBaseData.Halted
     }
-    const UserData = GetDictionaryItem("UserData")
+    let UserData = GetDictionaryItem("UserData")
 
     const Targets = UserData.Targets
     for (const Wallet in Targets) {
@@ -553,10 +578,37 @@ window.addEventListener('load', () => {
         const data = JSON.parse(event.data);
         const type = data.type
         if (type == "Transaction") {
-            const Divs = WalletToRecentTransactionElements[data.data.Wallet]
-            Divs.TransactionInfo.classList.toggle('hidden')
-            //TODO make it so that it updates text and trans type
+            const Divs = WalletToRecentTransactionElements[data.data.CopyingWallet]
+            SetVisible(Divs.TransactionInfo, true)
+            const TimeStamp = Divs.TimeStamp
+            const BarType = Divs.LastTradeType
+            const LTT = data.data.transactionType == "sell" ? "SOLD" : "BOUGHT"
+            const LastTransClr = LTT == "BOUGHT" ? "green" : "red"
+            const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
+            BarType.innerHTML = `<span style="color:${LastTransClr}">${LTT}</span>`
+            BarType.style.backgroundColor = CLR;
+            BarType.style.border = `2px solid ${CLR}`;
+            const EpochTime = data.data.Time
+            if (is24HoursSince(EpochTime)) {
+                const TimeParsed = convertEpochToDate(EpochTime, false)
+                TimeStr = `${TimeParsed}`
+                
+            } else {
+                const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
+                TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
+                //TODO make it say month/day depending on locale
+            }
+            if (!EpochTime) {
+                TransactionInfo.classList.toggle('hidden');
+            }
+            TimeStamp.innerHTML = `<span>${TimeStr}</span>`
+            const UserData = GetDictionaryItem("UserData")
+            UserData.Targets[data.data.CopyingWallet].RecentTransactions.push(data.data)
+
+            //TODO make this into a function instead of this mess
         }
+
+
         console.log('Message from server:', data);
     };
     ws.onclose = (event) => {

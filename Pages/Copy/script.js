@@ -23,7 +23,7 @@ const DetailsAsset = "../../Assets/WalletCopying/Details.png"
 const TrashAsset = "../../Assets/WalletCopying/Trash.png"
 const PauseAssetIcon = "../../Assets/WalletCopying/Pause.png"
 const UnpauseAssetIcon = "../../Assets/WalletCopying/Unpause.png"
-
+let PreviousTransactionsFrame = null
 //EYWsnfIKgPo2E
 let ActiveMapping = {}
 let EditFrameKids = {}
@@ -111,15 +111,62 @@ function convertEpochToLocalTimeWithPeriod(epochTime) {
         period: period,
     };
 }
-
-
+function formatLargeNumber(num) {
+    if (num >= 1e9) {
+        return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B'; // Billion
+    } else if (num >= 1e6) {
+        return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M'; // Million
+    } else if (num >= 1e3) {
+        return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'k'; // Thousand
+    } else {
+        return num.toString(); // Less than 1000
+    }
+}
+function ClearAllChildren(Element) {
+    while (Element.firstChild) {
+        Element.removeChild(Element.firstChild);
+    }
+}
 
 function is24HoursSince(epochTime) {
     const currentTime = Date.now()
     const elapsedTime = currentTime - epochTime * 1000
     return elapsedTime >= 24 * 60 * 60 * 1000
 }
+function CreateRecentTransactionCard(Data) {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const TransType = document.createElement("div")
 
+    const HolderType = document.createElement("div")
+    HolderType.className = "HolderType"
+
+    const LTT = Data.transactionType == "sell" ? "SOLD" : "BOUGHT"
+    let AggregateParsed = null
+    if (LTT == "SOLD"){
+        AggregateParsed = (Data.FactorSold * 100).toString() + "%"
+    } else {
+        AggregateParsed = formatLargeNumber(Data.AmountTheyreBuying)
+    }
+    const LastTransClr = LTT == "BOUGHT" ? "green" : "red"
+    const Aggregate = document.createElement("div")
+
+    Aggregate.innerHTML = `<span style="color:${LastTransClr}">${AggregateParsed}</span>`
+    HolderType.appendChild(Aggregate)
+
+
+    const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
+    TransType.className = "CLTT"
+    TransType.innerHTML = `<span style="color:${LastTransClr}">${LTT}</span>`
+    TransType.style.backgroundColor = CLR;
+    TransType.style.border = `2px solid ${CLR}`;
+    TransType.style.borderRadius = '4px'
+    TransType.style.padding = '4px 8px';
+    HolderType.appendChild(TransType)
+
+    card.appendChild(HolderType);
+    PreviousTransactionsFrame.appendChild(card);
+}
 function ChangeWalletAddress(EditFrameVis, New, Data) {
     const Original = EditFrameVis.Wallet.id
     EditFrameVis.Wallet.id = New
@@ -208,7 +255,7 @@ window.addEventListener('load', () => {
     document.body.classList.add('visible');
     const EditFrame = document.createElement('div');
     EditFrame.className = "EditFrame"
-    const PreviousTransactionsFrame = document.createElement("div")
+    PreviousTransactionsFrame = document.createElement("div")
     PreviousTransactionsFrame.className = "PreviousTransactionsFrame"
     for (const k in Parameters) {
         const PerameterHolder = document.createElement("div")
@@ -295,6 +342,7 @@ window.addEventListener('load', () => {
         Details.type = "image"
         Details.src = DetailsAsset
         Details.className = "WalletIcon"
+        SetVisible(Details, false)
         IconsHolder.appendChild(Details)
 
 
@@ -329,6 +377,7 @@ window.addEventListener('load', () => {
         let MostRecentTransaction = DataBaseData.RecentTransactions[DataBaseData.RecentTransactions.length - 1]
         if (MostRecentTransaction) {
             EpochTime = MostRecentTransaction.Time
+            SetVisible(Details)
             console.log("found most recent trans for ", WalletAddress, DataBaseData)
         } else {
         }
@@ -345,7 +394,6 @@ window.addEventListener('load', () => {
         }
         if (!EpochTime) {
             TransactionInfo.classList.toggle('hidden');
-
         }
 
         TimeStamp.innerHTML = `<span>${TimeStr}</span>`
@@ -368,7 +416,7 @@ window.addEventListener('load', () => {
         LastTradeType.style.border = `2px solid ${CLR}`;
         LastTradeType.style.borderRadius = '4px'
         LastTradeType.style.padding = '4px 8px';
-        WalletToRecentTransactionElements[WalletAddress] = { TransactionInfo: TransactionInfo, LastTradeType: LastTradeType, TimeStamp: TimeStamp }
+        WalletToRecentTransactionElements[WalletAddress] = { DetailsIcon: Details, TransactionInfo: TransactionInfo, LastTradeType: LastTradeType, TimeStamp: TimeStamp }
 
         TransactionInfo.appendChild(LastTradeType)
 
@@ -524,16 +572,17 @@ window.addEventListener('load', () => {
 
             PreviousWalletDiv = Wallet;
             LastIndexedAt = CurrentWalletDiv;
-
-            if (PreviousTransactionsFrameVisible){
-
+            ClearAllChildren(PreviousTransactionsFrame)
+            if (PreviousTransactionsFrameVisible) {
                 const UserData = GetDictionaryItem("UserData")
                 const TargetWallet = PreviousTransactionsFrameVisible.OriginalAccount
                 const RecentTransactions = UserData.Targets[TargetWallet].RecentTransactions
-                
-                for (const TransInfo of RecentTransactions){
-                    console.log(TransInfo)
+                for (let i = RecentTransactions.length - 1; i >= 0; i--) {
+                    const TransInfo = RecentTransactions[i];
+                    CreateRecentTransactionCard(TransInfo);
                 }
+                
+                
             }
         });
 
@@ -578,6 +627,11 @@ window.addEventListener('load', () => {
         const data = JSON.parse(event.data);
         const type = data.type
         if (type == "Transaction") {
+            const CurrentUserData = GetDictionaryItem("UserData")
+            CurrentUserData.Targets[data.data.CopyingWallet].RecentTransactions.push(data.data)
+            SetDictionaryItem("UserData", CurrentUserData)
+
+
             const Divs = WalletToRecentTransactionElements[data.data.CopyingWallet]
             SetVisible(Divs.TransactionInfo, true)
             const TimeStamp = Divs.TimeStamp
@@ -592,7 +646,7 @@ window.addEventListener('load', () => {
             if (is24HoursSince(EpochTime)) {
                 const TimeParsed = convertEpochToDate(EpochTime, false)
                 TimeStr = `${TimeParsed}`
-                
+
             } else {
                 const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
                 TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
@@ -604,7 +658,7 @@ window.addEventListener('load', () => {
             TimeStamp.innerHTML = `<span>${TimeStr}</span>`
             const UserData = GetDictionaryItem("UserData")
             UserData.Targets[data.data.CopyingWallet].RecentTransactions.push(data.data)
-
+            SetVisible(Divs.DetailsIcon)
             //TODO make this into a function instead of this mess
         }
 

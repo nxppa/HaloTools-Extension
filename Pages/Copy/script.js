@@ -113,15 +113,16 @@ function convertEpochToLocalTimeWithPeriod(epochTime) {
 }
 function formatLargeNumber(num) {
     if (num >= 1e9) {
-        return (num / 1e9).toFixed(1).replace(/\.0$/, '') + 'B'; // Billion
+        return (Math.round(num / 1e8) / 10).toString() + 'B'; // Billion
     } else if (num >= 1e6) {
-        return (num / 1e6).toFixed(1).replace(/\.0$/, '') + 'M'; // Million
+        return (Math.round(num / 1e5) / 10).toString() + 'M'; // Million
     } else if (num >= 1e3) {
-        return (num / 1e3).toFixed(1).replace(/\.0$/, '') + 'k'; // Thousand
+        return (Math.round(num / 1e2) / 10).toString() + 'k'; // Thousand
     } else {
-        return num.toString(); // Less than 1000
+        return Math.round(num).toString(); // Less than 1000, no decimals
     }
 }
+
 function ClearAllChildren(Element) {
     while (Element.firstChild) {
         Element.removeChild(Element.firstChild);
@@ -136,25 +137,50 @@ function is24HoursSince(epochTime) {
 function CreateRecentTransactionCard(Data) {
     const card = document.createElement('div');
     card.className = 'card';
-    const TransType = document.createElement("div")
+    const HolderLeft = document.createElement("div")
+    HolderLeft.className = "HolderLeft"
+    const LeftTop = document.createElement("div")
+    LeftTop.className = "LeftTop"
+    const LeftBottom = document.createElement("div")
+    LeftBottom.className = "LeftBottom"
 
+    const Picture = document.createElement("img")
+    const Symbol = document.createElement("div")
+    Symbol.className = "Symbol"
+    const TokenSymbol = Data.Token.symbol
+    Symbol.innerHTML = `<span style="color:white">${TokenSymbol}</span>`
+
+    Picture.className = "TokenImage"
+    Picture.src = Data.Token.Image 
+    const MintLabel = document.createElement("div")
+    const MintShorthand = shorthandString(Data.mintAddress, 3, 4, 4)
+    MintLabel.className = "MintLabel"
+    MintLabel.innerHTML = `<span style="color:white">${MintShorthand}</span>`
+    LeftBottom.appendChild(MintLabel)
+    LeftTop.appendChild(Picture)
+    LeftTop.appendChild(Symbol)
+    const TransType = document.createElement("div")
+    
+    
     const HolderType = document.createElement("div")
     HolderType.className = "HolderType"
-
+    
     const LTT = Data.transactionType == "sell" ? "SOLD" : "BOUGHT"
     let AggregateParsed = null
     if (LTT == "SOLD"){
-        AggregateParsed = (Data.FactorSold * 100).toString() + "%"
+        AggregateParsed = (Data.FactorSold * 100).toFixed(1).replace(/\.0$/, "") + "%";
     } else {
         AggregateParsed = formatLargeNumber(Data.AmountTheyreBuying)
     }
     const LastTransClr = LTT == "BOUGHT" ? "green" : "red"
-    const Aggregate = document.createElement("div")
+    Picture.style.border = `2px solid ${LastTransClr}`;
 
+    const Aggregate = document.createElement("div")
+    
     Aggregate.innerHTML = `<span style="color:${LastTransClr}">${AggregateParsed}</span>`
     HolderType.appendChild(Aggregate)
-
-
+    
+    
     const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
     TransType.className = "CLTT"
     TransType.innerHTML = `<span style="color:${LastTransClr}">${LTT}</span>`
@@ -163,7 +189,13 @@ function CreateRecentTransactionCard(Data) {
     TransType.style.borderRadius = '4px'
     TransType.style.padding = '4px 8px';
     HolderType.appendChild(TransType)
-
+    
+    
+    
+    
+    card.appendChild(HolderLeft)
+    HolderLeft.appendChild(LeftTop)
+    HolderLeft.appendChild(LeftBottom)
     card.appendChild(HolderType);
     PreviousTransactionsFrame.appendChild(card);
 }

@@ -196,7 +196,6 @@ h1 {
 .card {
     position: relative;
     width: 100%;
-    padding: 10px;
     font-size: 15px;
     border: 1px solid #444444;
     border-radius: 2px;
@@ -207,7 +206,7 @@ h1 {
     outline: none;
     font-family: 'Montserrat', sans-serif;
     height: 60px;
-    margin-bottom: 7px;
+    margin-bottom: 11px;
 }
 .PerameterHolder {
     width: 100%;
@@ -359,7 +358,10 @@ ParameterInput input:focus{
     font-family: "Courier New", monospace;
 }
 
-
+.MintLabel{
+    font-family: "Courier New", monospace;
+    
+}
 .HolderType {
     position: absolute;
     right: 4px; /* Anchor to the right edge */
@@ -384,8 +386,53 @@ ParameterInput input:focus{
     font-family: "Courier New", monospace;
 }
 
+.TokenImage {
+    position: relative; /* Adjust based on the container */
+    width: 28px; /* Adjust the size as needed */
+    height: 28px; /* Same value as width to make it a circle */
+    border-radius: 50%; /* This makes the image circular */
+    object-fit: cover; /* Ensures the image fills the container without distortion */
+    overflow: hidden; /* Prevents content from spilling out */
+    border: 2px solid #000; /* Optional: Adds a border */
+}
+.Symbol {
+    position: relative; /* Adjust based on the container */
+    font-family: "Courier New", monospace;
+    
+}
 
-
+.HolderLeft {
+    position: absolute;
+    display: flex; /* Use Flexbox for layout */
+    flex-direction: column; /* Change layout to vertical */
+    justify-content: flex-end; /* Align content to the bottom */
+    align-items: flex-start; /* Align items to the right edge */
+    gap: 5px; /* Consistent spacing between items */
+    font-size: 14px; /* Consistent font size */
+    text-align: right; /* Align text content to the right */
+    left: 15px;
+}
+.LeftBottom{
+    position: relative;
+    display: flex; /* Use Flexbox for layout */
+    flex-direction: row; /* Maintain logical order */
+    justify-content: flex-end; /* Align content to the right */
+    align-items: center; /* Center items vertically */
+    gap: 5px; /* Consistent spacing between items */
+    font-size: 14px; /* Consistent font size */
+    text-align: right; /* Align text content to the right */
+}
+.LeftTop {
+    position: relative;
+    display: flex; /* Use Flexbox for layout */
+    flex-direction: row; /* Maintain logical order */
+    justify-content: flex-end; /* Align content to the right */
+    align-items: center; /* Center items vertically */
+    gap: 5px; /* Consistent spacing between items */
+    font-size: 14px; /* Consistent font size */
+    text-align: right; /* Align text content to the right */
+    margin-top: 3px;
+}
 /* Target the entire scrollbar */
 ::-webkit-scrollbar {
     width: 8px;

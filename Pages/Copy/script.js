@@ -1,3 +1,4 @@
+
 function StartFetchingValidator() {
     const AuthTimeMins = 8
     setInterval(async () => {
@@ -16,13 +17,14 @@ function StartFetchingValidator() {
 }
 StartFetchingValidator();
 
-
-
 const PenAsset = "../../Assets/WalletCopying/Pen.png"
 const DetailsAsset = "../../Assets/WalletCopying/Details.png"
 const TrashAsset = "../../Assets/WalletCopying/Trash.png"
 const PauseAssetIcon = "../../Assets/WalletCopying/Pause.png"
 const UnpauseAssetIcon = "../../Assets/WalletCopying/Unpause.png"
+const CopyIcon = "../../Assets/Actions/Copy.png"
+const CheckIcon = "../../Assets/Actions/Check.png"
+const SolScanIcon = "../../Assets/Sidebar/Wrap.png"
 let PreviousTransactionsFrame = null
 //EYWsnfIKgPo2E
 let ActiveMapping = {}
@@ -73,9 +75,9 @@ async function post(URL, body) {
 }
 function SetVisible(Element, Yes = true) {
     if (Yes) {
-        Element.classList.remove('hidden'); // Remove the class
+        Element.classList.remove('hidden')
     } else {
-        Element.classList.add('hidden'); // Add the class
+        Element.classList.add('hidden')
     }
 }
 function SetDictionaryItem(Item, Dictionary) {
@@ -87,7 +89,7 @@ function GetDictionaryItem(Item) {
     return DataParsed
 }
 function convertEpochToDate(epochTime, isMonthFirst = true) {
-    const date = new Date(epochTime * 1000);
+    const date = new Date(epochTime);
     const day = date.getDate();
     const month = date.getMonth() + 1;
     const formattedDay = day.toString().padStart(2, '0');
@@ -103,8 +105,8 @@ function convertEpochToLocalTimeWithPeriod(epochTime) {
     const date = new Date(epochTime * 1000);
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    const formattedHours = hours % 12 || 12; // Convert 0 to 12 for AM/PM
-    const formattedMinutes = minutes.toString().padStart(2, '0'); // Pad single-digit minutes
+    const formattedHours = hours % 12 || 12
+    const formattedMinutes = minutes.toString().padStart(2, '0')
     const period = hours >= 12 ? 'PM' : 'AM';
     return {
         time: `${formattedHours}:${formattedMinutes}`,
@@ -113,13 +115,13 @@ function convertEpochToLocalTimeWithPeriod(epochTime) {
 }
 function formatLargeNumber(num) {
     if (num >= 1e9) {
-        return (Math.round(num / 1e8) / 10).toString() + 'B'; // Billion
+        return (Math.round(num / 1e8) / 10).toString() + 'B'
     } else if (num >= 1e6) {
-        return (Math.round(num / 1e5) / 10).toString() + 'M'; // Million
+        return (Math.round(num / 1e5) / 10).toString() + 'M'
     } else if (num >= 1e3) {
-        return (Math.round(num / 1e2) / 10).toString() + 'k'; // Thousand
+        return (Math.round(num / 1e2) / 10).toString() + 'k'
     } else {
-        return Math.round(num).toString(); // Less than 1000, no decimals
+        return Math.round(num).toString()
     }
 }
 
@@ -134,6 +136,20 @@ function is24HoursSince(epochTime) {
     const elapsedTime = currentTime - epochTime * 1000
     return elapsedTime >= 24 * 60 * 60 * 1000
 }
+function isEpochTimeDayBefore(epochTime) {
+    const inputDate = new Date(epochTime);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    return (
+        inputDate.getFullYear() === yesterday.getFullYear() &&
+        inputDate.getMonth() === yesterday.getMonth() &&
+        inputDate.getDate() === yesterday.getDate()
+    );
+}
+
+
 function CreateRecentTransactionCard(Data) {
     const card = document.createElement('div');
     card.className = 'card';
@@ -141,33 +157,114 @@ function CreateRecentTransactionCard(Data) {
     HolderLeft.className = "HolderLeft"
     const LeftTop = document.createElement("div")
     LeftTop.className = "LeftTop"
+    LeftTop.addEventListener('mouseenter', () => {
+        let ExtraInfoFrame = document.getElementById("ExtraInfoFrame")
+        let SymbolFull = document.getElementById("SymbolFull")
+        let TokenName = document.getElementById("TokenName")
+        ExtraInfoFrame.style.opacity = '1'; // Fully visible
+        const TokenSymbol = Data.Token.symbol
+        const Name = Data.Token.name
+        
+        SymbolFull.innerHTML = `<span style="color:white">${TokenSymbol}</span>`
+        TokenName.innerHTML = `<span style="color:white">${Name}</span>`
+    });
+
+    LeftTop.addEventListener('mouseleave', () => {
+        let ExtraInfoFrame = document.getElementById("ExtraInfoFrame")
+        ExtraInfoFrame.style.opacity = '0'; // Fully invisible
+    });
+
+
     const LeftBottom = document.createElement("div")
     LeftBottom.className = "LeftBottom"
+    let TimeStr = null
+    const EpochTime = Data.Time
+    if (is24HoursSince(EpochTime) || isEpochTimeDayBefore(EpochTime)) {
+        const TimeParsed = convertEpochToDate(EpochTime, false)
+        TimeStr = `${TimeParsed}`
+
+    } else {
+        const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
+        TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
+        //TODO make it say month/day depending on locale
+    }
+    if (!EpochTime) {
+        TransactionInfo.classList.toggle('hidden');
+    }
+    const TimeStamp = document.createElement("span")
+    TimeStamp.id = "TimeStamp"
+    TimeStamp.innerHTML = `<span>${TimeStr}</span>`
+    TimeStamp.style.color = "rgba(150, 150, 150)"
+
+    const Copy = document.createElement("input")
+    Copy.type = "image"
+    Copy.src = CopyIcon
+    Copy.className = "CopyIcon"
+    Copy.addEventListener("click", () => {
+        const textToCopy = Data.mintAddress
+        navigator.clipboard.writeText(textToCopy).then(() => {
+        }).catch(err => {
+            console.error("Failed to copy text: ", err);
+        });
+        Copy.src = CheckIcon
+        setTimeout(() => {
+            Copy.src = CopyIcon
+        }, 500)
+    })
+
+    const SolScan = document.createElement("input")
+    SolScan.type = "image"
+    SolScan.src = SolScanIcon
+    SolScan.className = "CopyIcon"
+    SolScan.addEventListener("click", () => {
+        const textToCopy = Data.Signature
+        navigator.clipboard.writeText(textToCopy).then(() => {
+        }).catch(err => {
+            console.error("Failed to copy text: ", err);
+        });
+        SolScan.src = CheckIcon
+        setTimeout(() => {
+            SolScan.src = SolScanIcon
+        }, 500)
+    })
+
+
 
     const Picture = document.createElement("img")
     const Symbol = document.createElement("div")
     Symbol.className = "Symbol"
-    const TokenSymbol = Data.Token.symbol
-    Symbol.innerHTML = `<span style="color:white">${TokenSymbol}</span>`
+    const TokenSymbol = shorthandString(Data.Token.symbol, 3, 2, 2)
+    const Success = Data.SuccessfullyEnacted
+    let IndicColour = Success ? "green" : "red"
+    if (Data.Halted) {
+        IndicColour = "orange"
+    }
+    Symbol.innerHTML = `<span style="color:white">${TokenSymbol}</span>\u2009<span style="color:${IndicColour}">\u25C9</span>`
 
     Picture.className = "TokenImage"
-    Picture.src = Data.Token.Image 
+    Picture.src = Data.Token.Image
     const MintLabel = document.createElement("div")
-    const MintShorthand = shorthandString(Data.mintAddress, 3, 4, 4)
+    let MintShorthand = shorthandString(Data.mintAddress, 3, 4, 4)
+    //MintShorthand += Data.mintAddress.endsWith("pump") ? "(💊)" : "(🪙)"
+
+
     MintLabel.className = "MintLabel"
     MintLabel.innerHTML = `<span style="color:white">${MintShorthand}</span>`
+
     LeftBottom.appendChild(MintLabel)
+    LeftBottom.appendChild(Copy)
+    LeftBottom.appendChild(SolScan)
     LeftTop.appendChild(Picture)
     LeftTop.appendChild(Symbol)
     const TransType = document.createElement("div")
-    
-    
+
+
     const HolderType = document.createElement("div")
     HolderType.className = "HolderType"
-    
+
     const LTT = Data.transactionType == "sell" ? "SOLD" : "BOUGHT"
     let AggregateParsed = null
-    if (LTT == "SOLD"){
+    if (LTT == "SOLD") {
         AggregateParsed = (Data.FactorSold * 100).toFixed(1).replace(/\.0$/, "") + "%";
     } else {
         AggregateParsed = formatLargeNumber(Data.AmountTheyreBuying)
@@ -176,11 +273,19 @@ function CreateRecentTransactionCard(Data) {
     Picture.style.border = `2px solid ${LastTransClr}`;
 
     const Aggregate = document.createElement("div")
-    
+    const TopRight = document.createElement("div")
+    TopRight.className = "TopRight"
+    HolderType.appendChild(TopRight)
+
+
+    const BottomRight = document.createElement("div")
+    BottomRight.className = "BottomRight"
+    HolderType.appendChild(BottomRight)
+
     Aggregate.innerHTML = `<span style="color:${LastTransClr}">${AggregateParsed}</span>`
-    HolderType.appendChild(Aggregate)
-    
-    
+    TopRight.appendChild(TimeStamp)
+    TopRight.appendChild(Aggregate)
+
     const CLR = LastTransClr == "green" ? 'rgba(0, 255, 0, 0.2)' : "rgba(255, 0, 0, 0.2)"
     TransType.className = "CLTT"
     TransType.innerHTML = `<span style="color:${LastTransClr}">${LTT}</span>`
@@ -188,15 +293,17 @@ function CreateRecentTransactionCard(Data) {
     TransType.style.border = `2px solid ${CLR}`;
     TransType.style.borderRadius = '4px'
     TransType.style.padding = '4px 8px';
-    HolderType.appendChild(TransType)
-    
-    
-    
-    
+
+
+    BottomRight.appendChild(TransType)
+
+
+
+    card.appendChild(HolderType);
+
     card.appendChild(HolderLeft)
     HolderLeft.appendChild(LeftTop)
     HolderLeft.appendChild(LeftBottom)
-    card.appendChild(HolderType);
     PreviousTransactionsFrame.appendChild(card);
 }
 function ChangeWalletAddress(EditFrameVis, New, Data) {
@@ -283,6 +390,26 @@ function convertValue(param, value) {
     }
 }
 window.addEventListener('load', () => {
+    let ExtraInfoFrame = document.getElementById("ExtraInfoFrame")
+    let SymbolFull = document.createElement("div")
+    let TokenName = document.createElement("div")
+    SymbolFull.id = "SymbolFull"
+    SymbolFull.innerHTML = `<span style="color:white">token symbol</span>`
+    TokenName.id = "TokenName"
+    TokenName.innerHTML = `<span style="color:white">TokenName</span>`
+
+    ExtraInfoFrame.appendChild(TokenName)
+    ExtraInfoFrame.appendChild(SymbolFull)
+    document.addEventListener('mousemove', (event) => {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+
+        const offsetX = ExtraInfoFrame.offsetWidth / 2;
+        const offsetY = ExtraInfoFrame.offsetHeight;
+        ExtraInfoFrame.style.left = (mouseX) + 'px';
+        ExtraInfoFrame.style.top = (mouseY - offsetY) + 'px';
+    });
+
 
     document.body.classList.add('visible');
     const EditFrame = document.createElement('div');
@@ -415,7 +542,7 @@ window.addEventListener('load', () => {
         }
 
         let TimeStr = null
-        if (is24HoursSince(EpochTime)) {
+        if (is24HoursSince(EpochTime) || isEpochTimeDayBefore(EpochTime)) {
             const TimeParsed = convertEpochToDate(EpochTime, false)
             TimeStr = `${TimeParsed}`
 
@@ -507,9 +634,7 @@ window.addEventListener('load', () => {
                 AddressName.innerHTML = `${shorthandString(Wallet.id, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
             }
         })
-        // Pen button logic
         Pen.addEventListener("click", () => {
-            // Hide PreviousTransactionsFrame if visible
             if (PreviousTransactionsFrameVisible) {
                 PreviousTransactionsFrame.classList.add('hidden');
                 PreviousTransactionsFrameVisible = false;
@@ -565,11 +690,7 @@ window.addEventListener('load', () => {
             ActiveMapping[Wallet.id] = !DataBaseData.Halted;
         });
 
-        // Details button logic
         Details.addEventListener("click", () => {
-            // Hide EditFrame if visible
-
-
             if (EditFrameVisible) {
                 EditFrame.classList.add('hidden');
                 EditFrameVisible = false;
@@ -613,8 +734,8 @@ window.addEventListener('load', () => {
                     const TransInfo = RecentTransactions[i];
                     CreateRecentTransactionCard(TransInfo);
                 }
-                
-                
+
+
             }
         });
 
@@ -675,15 +796,9 @@ window.addEventListener('load', () => {
             BarType.style.backgroundColor = CLR;
             BarType.style.border = `2px solid ${CLR}`;
             const EpochTime = data.data.Time
-            if (is24HoursSince(EpochTime)) {
-                const TimeParsed = convertEpochToDate(EpochTime, false)
-                TimeStr = `${TimeParsed}`
-
-            } else {
-                const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
-                TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
-                //TODO make it say month/day depending on locale
-            }
+            const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
+            TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
+            //TODO make it say month/day depending on locale
             if (!EpochTime) {
                 TransactionInfo.classList.toggle('hidden');
             }

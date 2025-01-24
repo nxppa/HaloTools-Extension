@@ -371,10 +371,26 @@ ParameterInput input:focus{
     align-items: flex-end; /* Align items to the right edge */
     gap: 5px; /* Consistent spacing between items */
     font-size: 14px; /* Consistent font size */
+    top:2px;
     text-align: right; /* Align text content to the right */
 }
 
-
+#ExtraInfoFrame {
+    position: absolute;
+    width: 165px;
+    height: 70px;
+    
+    font-size: 15px;
+    border: 1px solid #444444;
+    border-radius: 2px;
+    background-color: #222;
+    color: white;
+    box-shadow: 0 0 3px 0px #4b4b4b;    
+    
+    pointer-events: none; /* Prevent the div from blocking mouse events */
+    z-index: 9999; /* Ensure it appears on top of other elements */
+    opacity:0;
+  }
 .CLTT{
     width: 40px;
     height: 20px;
@@ -385,7 +401,9 @@ ParameterInput input:focus{
     color:#f4f4f4;
     font-family: "Courier New", monospace;
 }
-
+.Aggregate {
+    font-size: 14px;
+}
 .TokenImage {
     position: relative; /* Adjust based on the container */
     width: 28px; /* Adjust the size as needed */
@@ -410,7 +428,7 @@ ParameterInput input:focus{
     gap: 5px; /* Consistent spacing between items */
     font-size: 14px; /* Consistent font size */
     text-align: right; /* Align text content to the right */
-    left: 15px;
+    left: 7px;
 }
 .LeftBottom{
     position: relative;
@@ -432,6 +450,33 @@ ParameterInput input:focus{
     font-size: 14px; /* Consistent font size */
     text-align: right; /* Align text content to the right */
     margin-top: 3px;
+}
+.BottomRight {
+    position: relative;
+    display: flex; /* Use Flexbox for layout */
+    flex-direction: row; /* Maintain logical order */
+    justify-content: flex-end; /* Align content to the right */
+    align-items: center; /* Center items vertically */
+    gap: 5px; /* Consistent spacing between items */
+    font-size: 14px; /* Consistent font size */
+    text-align: right; /* Align text content to the right */
+    margin-top: 3px;
+}
+.TopRight {
+    position: relative;
+    display: flex; /* Use Flexbox for layout */
+    flex-direction: row; /* Maintain logical order */
+    justify-content: flex-end; /* Align content to the right */
+    align-items: center; /* Center items vertically */
+    gap: 5px; /* Consistent spacing between items */
+    font-size: 14px; /* Consistent font size */
+    text-align: right; /* Align text content to the right */
+    margin-top: 0px;
+}
+.CopyIcon {
+    position: relative; /* Adjust based on the container */
+    width: 18px; /* Adjust the size as needed */
+    height: 18px; /* Same value as width to make it a circle */
 }
 /* Target the entire scrollbar */
 ::-webkit-scrollbar {

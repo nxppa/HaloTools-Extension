@@ -133,7 +133,7 @@ function ClearAllChildren(Element) {
 
 function is24HoursSince(epochTime) {
     const currentTime = Date.now()
-    const elapsedTime = currentTime - epochTime * 1000
+    const elapsedTime = currentTime - epochTime
     return elapsedTime >= 24 * 60 * 60 * 1000
 }
 function isEpochTimeDayBefore(epochTime) {

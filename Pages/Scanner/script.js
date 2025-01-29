@@ -1,4 +1,6 @@
 
+
+
 const Colours = {
     "Numbers": "#8eff93",
     "Type": "#8eff93",
@@ -23,7 +25,7 @@ const SpecialTokens = {
     EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: "USDC",
     Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: "USDT",
     HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr: "EURC",
-  }
+}
 
 const SelectablePreset = "user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;"
 
@@ -31,52 +33,52 @@ function sortOpenPositions(openPositions, specialTokens) {
     const special = [];
     const regular = [];
     const pump = [];
-  
+
     for (const [mint, amount] of Object.entries(openPositions)) {
-      if (specialTokens[mint]) {
-        special.push({ mint, amount });
-      } else if (mint.endsWith("pump")) {
-        pump.push({ mint, amount });
-      } else {
-        regular.push({ mint, amount });
-      }
+        if (specialTokens[mint]) {
+            special.push({ mint, amount });
+        } else if (mint.endsWith("pump")) {
+            pump.push({ mint, amount });
+        } else {
+            regular.push({ mint, amount });
+        }
     }
     special.sort((a, b) => b.amount - a.amount);
     regular.sort((a, b) => b.amount - a.amount);
     pump.sort((a, b) => b.amount - a.amount);
     const sorted = [...special, ...regular, ...pump].map(item => item.mint);
     return sorted;
-  }
+}
 window.addEventListener('load', () => {
     function ParseJSON(result) {
         const data = result.data;
         const Currency = Currencies[data.account]
         const Type = (Currency && "Currency") || result.type
-        
-        
+
+
         let BaseString = `<span style="color:${Colours.Type}; ${SelectablePreset}">Type: </span><span style="color:${Colours.TypeAssigned}; ${SelectablePreset}">${Type}\n</span>`;
         switch (Type) {
             case "Wallet":
                 BaseString += `<span style="color:${Colours.Account}; ${SelectablePreset}">Account: </span><span style="color:${Colours.Program}; ${SelectablePreset}">${data.account} \n</span>`;
                 BaseString += `<span style="color:${Colours.Balance}; ${SelectablePreset}">Balance: </span><span style="color:${Colours.SOL}; ${SelectablePreset}">${data.balance} Sol\n</span>`;
                 BaseString += `<span style="color:${Colours.Positions}; ${SelectablePreset}">Open Positions (${Object.keys(data.openPositions).length}): \n</span>`;
-                for (const Mint of sortOpenPositions(data.openPositions, SpecialTokens)){
+                for (const Mint of sortOpenPositions(data.openPositions, SpecialTokens)) {
                     let AddedInfo = "(🪙)";
                     let SpecialMint = SpecialTokens[Mint]
-                    if (Mint.endsWith("pump")){
+                    if (Mint.endsWith("pump")) {
                         AddedInfo = "(💊)";
-                    } else if (SpecialMint){
+                    } else if (SpecialMint) {
                         AddedInfo = `(✨)`
-                    } 
+                    }
 
                     BaseString += `<span style="color:${Colours.Program}; ${SelectablePreset}">${AddedInfo}${Mint}:</span> <span style="color:${Colours.Numbers}; ${SelectablePreset}">${data.openPositions[Mint]} \n</span>`;
                 }
 
                 break;
             case "Mint":
-                
+
                 let AddedInfo = "";
-                if (data.account.endsWith("pump")){
+                if (data.account.endsWith("pump")) {
                     AddedInfo = "(💊)";
                 }
                 BaseString += `<span style="color:${Colours.Account}; ${SelectablePreset}">Mint${AddedInfo}: </span><span style="color:${Colours.Program}; ${SelectablePreset}">${data.account} \n</span>`;
@@ -92,8 +94,8 @@ window.addEventListener('load', () => {
         }
         return BaseString;
     }
-    
-    
+
+
 
     document.body.classList.add('visible');
     const InputBox = document.querySelector('input');
@@ -102,16 +104,16 @@ window.addEventListener('load', () => {
     const Download = document.getElementById("Download")
 
 
-    async function QueryAccountDetails(){
+    async function QueryAccountDetails() {
         const Account = InputBox.value
         const Token = localStorage.getItem('session_token')
         const Req = `https://bayharbour.boats/api/tools/scanner?session_token=${Token}&account=${encodeURIComponent(Account)}`
         console.log(Req)
-    
+
         const loadingTexts = ["fetching.", "fetching..", "fetching..."]
         let currentLoadingText = 0
         OutputBox.innerHTML = loadingTexts[currentLoadingText]
-    
+
         const loadingInterval = setInterval(() => {
             currentLoadingText = (currentLoadingText + 1) % loadingTexts.length
             OutputBox.innerHTML = loadingTexts[currentLoadingText]

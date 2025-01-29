@@ -16,7 +16,7 @@ function StartFetchingValidator() {
     }, 10000)
 }
 StartFetchingValidator();
-
+const HalfSpace = "\u2009"
 const PenAsset = "../../Assets/WalletCopying/Pen.png"
 const DetailsAsset = "../../Assets/WalletCopying/Details.png"
 const TrashAsset = "../../Assets/WalletCopying/Trash.png"
@@ -185,7 +185,7 @@ function CreateRecentTransactionCard(Data) {
 
     } else {
         const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
-        TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
+        TimeStr = `${TimeParsed.time}${HalfSpace}${TimeParsed.period}`
         //TODO make it say month/day depending on locale
     }
     if (!EpochTime) {
@@ -239,7 +239,7 @@ function CreateRecentTransactionCard(Data) {
     if (Data.Halted) {
         IndicColour = "orange"
     }
-    Symbol.innerHTML = `<span style="color:white">${TokenSymbol}</span>\u2009<span style="color:${IndicColour}">\u25C9</span>`
+    Symbol.innerHTML = `<span style="color:white">${TokenSymbol}</span>${HalfSpace}<span style="color:${IndicColour}">\u25C9</span>`
 
     Picture.className = "TokenImage"
     Picture.src = Data.Token.Image
@@ -337,7 +337,7 @@ function ChangeWalletAddress(EditFrameVis, New, Data) {
                 SetDictionaryItem("UserData", UserData)
                 Colour = "red"
             }
-            EditFrameVis.WalletLabel.innerHTML = `${shorthandString(New, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+            EditFrameVis.WalletLabel.innerHTML = `${shorthandString(New, 3, 5, 5)}${HalfSpace}<span style="color: ${Colour};">\u25C9</span>`;
             UserData.Targets[New].Halted = true
             EditFrameVis.PauseIcon.src = UnpauseAssetIcon
         }
@@ -464,7 +464,7 @@ window.addEventListener('load', () => {
         ActiveMapping[EditFrameVisible.Wallet.id] = false
         if (EditFrameVisible.Wallet.id != NewWallet) {
             const Colour = "grey"
-            EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(NewWallet, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+            EditFrameVisible.WalletLabel.innerHTML = `${shorthandString(NewWallet, 3, 5, 5)}${HalfSpace}<span style="color: ${Colour};">\u25C9</span>`;
             ChangeWalletAddress(EditFrameVisible, NewWallet, VariablesParsed)
         } else {
             SetWalletDetails(EditFrameVisible, VariablesParsed)
@@ -548,7 +548,7 @@ window.addEventListener('load', () => {
 
         } else {
             const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
-            TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
+            TimeStr = `${TimeParsed.time}${HalfSpace}${TimeParsed.period}`
             //TODO make it say month/day depending on locale
         }
         if (!EpochTime) {
@@ -588,10 +588,10 @@ window.addEventListener('load', () => {
         if (!Client) {
 
             const Colour = DataBaseData.Valid ? (!DataBaseData.Halted ? "green" : "orange") : "red"
-            AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+            AddressName.innerHTML = `${shorthandString(WalletAddress, 3, 5, 5)}${HalfSpace}<span style="color: ${Colour};">\u25C9</span>`;
         } else {
             const Colour = "red"
-            AddressName.innerHTML = `${WalletAddress}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+            AddressName.innerHTML = `${WalletAddress}${HalfSpace}<span style="color: ${Colour};">\u25C9</span>`;
         }
 
 
@@ -631,7 +631,7 @@ window.addEventListener('load', () => {
                 const URL = `https://bayharbour.boats/setValue?session_token=${Token}&account=${Wallet.id}&param=Halted&value=${!ActiveMapping[Wallet.id]}`
                 post(URL)
                 const Colour = WalletData.Valid ? (ActiveMapping[Wallet.id] ? "green" : "orange") : "red"
-                AddressName.innerHTML = `${shorthandString(Wallet.id, 3, 5, 5)}\u2009<span style="color: ${Colour};">\u25C9</span>`;
+                AddressName.innerHTML = `${shorthandString(Wallet.id, 3, 5, 5)}${HalfSpace}<span style="color: ${Colour};">\u25C9</span>`;
             }
         })
         Pen.addEventListener("click", () => {
@@ -797,7 +797,7 @@ window.addEventListener('load', () => {
             BarType.style.border = `2px solid ${CLR}`;
             const EpochTime = data.data.Time
             const TimeParsed = convertEpochToLocalTimeWithPeriod(EpochTime)
-            TimeStr = `${TimeParsed.time}\u2009${TimeParsed.period}`
+            TimeStr = `${TimeParsed.time}${HalfSpace}${TimeParsed.period}`
             //TODO make it say month/day depending on locale
             if (!EpochTime) {
                 TransactionInfo.classList.toggle('hidden');
@@ -806,7 +806,7 @@ window.addEventListener('load', () => {
             const UserData = GetDictionaryItem("UserData")
             UserData.Targets[data.data.CopyingWallet].RecentTransactions.push(data.data)
             SetVisible(Divs.DetailsIcon)
-            //TODO make this into a function instead of this mess
+            //TODO make this into a function instead of this fuckery
         }
 
 

@@ -100,4 +100,4 @@ HUpPyLU8KWisCAr3mzWy2FKT6uuxQ2qGgJQxyTpDoes5:0xSun;Hnnw2hAgPgGiFKouRWvM3fSk3HnYg
 
 
 //parseCommand(`import ${Wallets}`)
-parseCommand(`help`)
+parseCommand(`import ${Wallets}`)

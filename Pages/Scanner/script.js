@@ -30,22 +30,22 @@ const SpecialTokens = {
 const SelectablePreset = "user-select: text; -webkit-user-select: text; -moz-user-select: text; -ms-user-select: text;"
 
 function sortOpenPositions(openPositions, specialTokens) {
-    const special = [];
-    const regular = [];
-    const pump = [];
+    const special = []
+    const regular = []
+    const pump = []
 
     for (const [mint, amount] of Object.entries(openPositions)) {
         if (specialTokens[mint]) {
-            special.push({ mint, amount });
+            special.push({ mint, amount })
         } else if (mint.endsWith("pump")) {
-            pump.push({ mint, amount });
+            pump.push({ mint, amount })
         } else {
-            regular.push({ mint, amount });
+            regular.push({ mint, amount })
         }
     }
-    special.sort((a, b) => b.amount - a.amount);
-    regular.sort((a, b) => b.amount - a.amount);
-    pump.sort((a, b) => b.amount - a.amount);
+    special.sort((a, b) => b.amount - a.amount)
+    regular.sort((a, b) => b.amount - a.amount)
+    pump.sort((a, b) => b.amount - a.amount)
     const sorted = [...special, ...regular, ...pump].map(item => item.mint);
     return sorted;
 }

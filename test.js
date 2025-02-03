@@ -3,7 +3,7 @@ const MyKey = "EYWsnfIKgPo2E"
 const Commands = {
     "echo": {
         Aliases: ["print"],
-        Structure: [0, 2], // echo hello
+        Structure: [0, 2],
         Executable: function(result){
             console.log("Echo response: ", result.parameter)
         },

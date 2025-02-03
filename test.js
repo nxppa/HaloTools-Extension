@@ -1,13 +1,22 @@
 const MyKey = "EYWsnfIKgPo2E"
-
+const StructureMap = ["command", "subcommand", "parameter"]
 const Commands = {
     "echo": {
         Aliases: ["print"],
         Structure: [0, 2],
         Executable: function(result){
+            console.log(result)
             console.log("Echo response: ", result.parameter)
         },
         Description:"echoes whatever u put in the console"
+    },
+    "clear": {
+        Aliases: ["cls"],
+        Structure: [0],
+        Executable: function(result){
+            console.log("gotta add functionality")
+        },
+        Description:"clears console"
     },
     "import": {
         Aliases: ["addwallets"],
@@ -100,4 +109,4 @@ HUpPyLU8KWisCAr3mzWy2FKT6uuxQ2qGgJQxyTpDoes5:0xSun;Hnnw2hAgPgGiFKouRWvM3fSk3HnYg
 
 
 //parseCommand(`import ${Wallets}`)
-parseCommand(`import ${Wallets}`)
+parseCommand(`print hi`)

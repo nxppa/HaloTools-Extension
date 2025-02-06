@@ -783,8 +783,6 @@ window.addEventListener('load', () => {
             const CurrentUserData = GetDictionaryItem("UserData")
             CurrentUserData.Targets[data.data.CopyingWallet].RecentTransactions.push(data.data)
             SetDictionaryItem("UserData", CurrentUserData)
-
-
             const Divs = WalletToRecentTransactionElements[data.data.CopyingWallet]
             SetVisible(Divs.TransactionInfo, true)
             const TimeStamp = Divs.TimeStamp

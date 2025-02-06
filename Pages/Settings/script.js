@@ -7,7 +7,6 @@ function Display(Text){
     TextBox.innerHTML = `<span style="color:white">${Text}</span>`
     OutputBox.appendChild(TextBox)
 }
-
 const Commands = {
     "echo": {
         Aliases: ["print"],
@@ -53,8 +52,25 @@ const Commands = {
         },
         Description:"allows you to mass import wallets"
     },
+    
+    "export": {
+        Aliases: ["exportwallets"],
+        Structure: [0, 2],
+        Executable: function(result){
+
+        },
+        Description:"exports wallet data as a string"
+    },
+    "axe": {
+        Aliases: ["removewallets"],
+        Structure: [0, 2],
+        Executable: function(result){
+            
+        },
+        Description:"removes all copying wallets"
+    },
     "help": {
-        Aliases: ["h", "-h", "-help"],
+        Aliases: ["-help",".help", "h", "-h", ".h"],
         Structure: [0, 2],
         Executable: function(result){
             if (!result.parameter) {
@@ -66,7 +82,7 @@ const Commands = {
                     cmd === result.parameter || Commands[cmd].Aliases.includes(result.parameter)
                 );
                 if (commandKey) {
-                    Display(`${commandKey}: ${Commands[commandKey].Description} | Aliases: ${Commands[commandKey].Aliases.join(", ") || "None"}`);
+                    Display(`${commandKey}: ${Commands[commandKey].Description} | Aliases: ${Commands[commandKey].Aliases.join(", ") || "None"} `);
                 } else {
                     Display("Unknown command");
                 }
@@ -87,13 +103,15 @@ async function post(URL, body) {
 function parseCommand(input) {
     let parts = input.trim().split(/\s+/);
     if (parts.length === 0 || parts[0] === '') {
+        Display("Invalid input")
         return { error: "Invalid input" };
     }
     let commandKey = Object.keys(Commands).find(cmd => 
         cmd === parts[0] || Commands[cmd].Aliases.includes(parts[0])
     );
     if (!commandKey) {
-        return { error: "Unknown command" };
+        Display(`unknown command "${parts[0]}"`)
+        return { error: `Unknown command "${parts[0]}"` };
     }
     let commandDef = Commands[commandKey];
     let result = { command: commandKey };
@@ -107,24 +125,22 @@ function parseCommand(input) {
             result.parameter = parts.slice(1).join(" ");
         }
     }
-    const Executable = Commands[result.command].Executable
-    Executable(result)
+    Commands[result.command].Executable(result)
     return result;
 }
 
 
 
 window.addEventListener('load', () => {
-
-
     document.body.classList.add('visible');
     const InputBox = document.querySelector('input');
     OutputBox = document.getElementById("scroll-box")
+    OutputBox.removeChild(OutputBox.firstChild);
     const Copy = document.getElementById("Copy")
     function EnterCommand(){
         const Command = InputBox.value
         parseCommand(Command)
-        
+        InputBox.value = ""
 
     }
     Copy.addEventListener("click", () => {

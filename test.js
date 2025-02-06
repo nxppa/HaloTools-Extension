@@ -32,7 +32,7 @@ const Commands = {
                     "MaxProportionSpending": 0.05,
                     "MinimumSpending": 0.1,
                     "MaxMarketCap": 0.04,
-                    "Halted": true,
+                    "Halted": true,    
                     "Alias": "Alias",
                     "Valid": false,
                     "RecentTransactions": []

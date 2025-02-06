@@ -8,7 +8,7 @@ function Display(Text){
     TextBox.innerHTML = `<span style="color:white">${Text}</span>`
     OutputBox.appendChild(TextBox)
 }
-
+    
 const Commands = {
     "echo": {
         Aliases: ["print"],
@@ -21,12 +21,12 @@ const Commands = {
     "clear": {
         Aliases: ["cls"],
         Structure: [0],
-        Executable: function(result){
+        Executable: function(result){  
             while (OutputBox.firstChild) {
                 OutputBox.removeChild(OutputBox.firstChild);
             }
         },
-        Description:"clears console"
+        Description:"  clears console"
     },
     "import": {
         Aliases: ["addwallets"],
@@ -126,7 +126,7 @@ function parseCommand(input) {
     );
     if (!commandKey) {
         Display(`unknown command "${parts[0]}"`)
-        return { error: `Unknown command "${parts[0]}"` };
+        return { error: `Unknown command "${parts[0]}"`};
     }
     let commandDef = Commands[commandKey];
     let result = { command: commandKey };
@@ -140,8 +140,7 @@ function parseCommand(input) {
             result.parameter = parts.slice(1).join(" ");
         }
     }
-    Commands[result.command].Executable(result)
-    return result;
+    return Commands[result.command].Executable(result)
 }
 
 window.addEventListener('load', () => {

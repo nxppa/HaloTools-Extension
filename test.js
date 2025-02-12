@@ -103,9 +103,6 @@ function parseCommand(input) {
     return result;
 }
 
-const Wallets = `
-HUpPyLU8KWisCAr3mzWy2FKT6uuxQ2qGgJQxyTpDoes5:0xSun;Hnnw2hAgPgGiFKouRWvM3fSk3HnYgRv4Xq1PjUEBEuWM:Gm5;5mtbmPwj2SMkxPP9c93s9oD9bmMdByTqepNarM9Y7u7e:Gm3;DfMxre4cKmvogbLrPigxmibVTTQDuzjdXojWzjCXXhzj:Euris
-`
 
 
 //parseCommand(`import ${Wallets}`)

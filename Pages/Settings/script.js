@@ -1,6 +1,7 @@
 const MyKey = "EYWsnfIKgPo2E"
 const StructureMap = ["command", "subcommand", "parameter"]
 let OutputBox = null
+const Wallets = `HUpPyLU8KWisCAr3mzWy2FKT6uuxQ2qGgJQxyTpDoes5:0xSun;Hnnw2hAgPgGiFKouRWvM3fSk3HnYgRv4Xq1PjUEBEuWM:Gm5;5mtbmPwj2SMkxPP9c93s9oD9bmMdByTqepNarM9Y7u7e:Gm3;DfMxre4cKmvogbLrPigxmibVTTQDuzjdXojWzjCXXhzj:Euris`
 
 function Display(Text){
     const TextBox = document.createElement("div")
@@ -26,7 +27,7 @@ const Commands = {
                 OutputBox.removeChild(OutputBox.firstChild);
             }
         },
-        Description:"  clears console"
+        Description:"clears console"
     },
     "import": {
         Aliases: ["addwallets"],
@@ -62,7 +63,7 @@ const Commands = {
         Aliases: ["exportwallets"],
         Structure: [0, 2],
         Executable: function(result){
-            // Export functionality here
+            // !Export functionality here
         },
         Description:"exports wallet data as a string"
     },
@@ -70,7 +71,14 @@ const Commands = {
         Aliases: ["removewallets"],
         Structure: [0, 2],
         Executable: function(result){
-            // Remove wallets functionality here
+            // !Remove wallets functionality here
+            const UserData = localStorage.getItem("UserData")
+            const DataParsed = JSON.parse(UserData)
+            for(const Wallet in DataParsed.Targets){
+                console.log(Wallet)
+                post(`https://bayharbour.boats/removeWallet?key=${MyKey}&account=${Wallet}`)
+            }
+            //
         },
         Description:"removes all copying wallets"
     },

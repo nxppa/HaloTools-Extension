@@ -1,6 +1,6 @@
 //EYWsnfIKgPo2E
 //TODO make it so that session key is renewed every few seconds while extension open 
-
+//TODO make it so that it doesnt attempt to login automatically when past token validation time
 function SemanticalVerify(key) { //TODO make it semantically verify based on length or whatever
     if (!key) {
         return false

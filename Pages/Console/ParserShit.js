@@ -7,7 +7,7 @@ function Display(Text){
     let OutputText = `${GetTime()} ${Text}`
     const TextBox = document.createElement("div")
     TextBox.className = "OutputText"
-    TextBox.innerHTML = `<span style="color:white">${OutputText}</span>`
+    TextBox.innerHTML = `<span style="color:white">${Text}</span>`
     OutputBox.appendChild(TextBox)
 }
 function GetTime(raw) {
